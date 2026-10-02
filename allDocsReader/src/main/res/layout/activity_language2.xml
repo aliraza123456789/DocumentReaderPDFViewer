@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".activities.ActivityMyLanguage">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/iv_header"
+            android:layout_width="@dimen/_60sdp"
+            android:layout_height="@dimen/_60sdp"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_5sdp"
+            android:layout_marginBottom="@dimen/_15sdp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="@dimen/_40sdp"
+            app:cardElevation="@dimen/_5sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="@color/blue_100"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/_15sdp"
+                android:adjustViewBounds="true"
+                android:scaleType="centerInside"
+                android:src="@drawable/svg_language_top"
+                tools:ignore="ContentDescription" />
+
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_6sdp"
+            android:fontFamily="@font/font_constantian"
+            android:includeFontPadding="false"
+            android:text="@string/title_languages"
+            android:textColor="@color/blue_700"
+            android:textSize="@dimen/_20sdp"
+            app:layout_constraintBottom_toBottomOf="@id/iv_header"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/iv_header"
+            app:layout_constraintTop_toTopOf="@id/iv_header" />
+
+        <!-- <ImageView
+             android:id="@+id/iv_header"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:adjustViewBounds="true"
+             android:src="@drawable/svg_language_header"
+             app:layout_constraintTop_toTopOf="parent"
+             tools:ignore="ContentDescription" />
+
+         <TextView
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_marginStart="@dimen/_30sdp"
+             android:layout_marginTop="@dimen/_20sdp"
+             android:fontFamily="@font/font_constantian"
+             android:includeFontPadding="false"
+             android:text="@string/title_languages"
+             android:textColor="@color/white"
+             android:textSize="@dimen/_30sdp"
+             app:layout_constraintEnd_toEndOf="parent"
+             app:layout_constraintStart_toStartOf="parent"
+             app:layout_constraintTop_toTopOf="parent" />
+ -->
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:clipToPadding="false"
+            android:layoutAnimation="@anim/layout_anim_down_to_up"
+            android:overScrollMode="never"
+            android:paddingBottom="@dimen/_10sdp"
+            android:scrollbars="none"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_header"
+            app:layout_goneMarginTop="@dimen/_2sdp" />
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.DocumentReaderPDFViewer" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Edge-to-edge: keep the system bars transparent so app content can
+             draw behind them. Icon appearance is applied at runtime by
+             DocumentReaderTheme (light-only app). -->
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:targetApi="o">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">true</item>
+
+        <!-- Remove the platform scrim behind the bars, otherwise a grey band
+             appears over the app background on gesture-nav devices. -->
+        <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+
+        <!-- Let the app draw into the display cutout area in landscape. -->
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+    </style>
+</resources>

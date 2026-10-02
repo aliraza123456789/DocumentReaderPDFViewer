@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+
+    <style name="Theme.AllDocReader.Toolbar.All_Files" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Primary brand color. -->
+
+        <item name="colorPrimary">@color/blue_700</item>
+        <item name="colorPrimaryVariant">@color/blue_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:targetApi="o">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">true</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+
+        <!-- Customize your theme here. -->
+
+        <item name="android:outlineSpotShadowColor" tools:ignore="NewApi">
+            ?attr/colorControlHighlight
+        </item>
+        <item name="colorControlHighlight">@color/blue_100</item>
+
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <!--Power Point File-->
+    <style name="Theme.AllDocReader.Toolbar.PPT_Files" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Primary brand color. -->
+
+        <item name="colorPrimary">@color/color_file_ppt_colorPrimaryVariant</item>
+        <item name="colorPrimaryVariant">@color/color_file_ppt_colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="backgroundColor">@color/color_file_ppt_backgroundColor</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:targetApi="o">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">true</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+
+        <!-- Customize your theme here. -->
+
+        <item name="android:outlineSpotShadowColor" tools:ignore="NewApi">
+            ?attr/colorControlHighlight
+        </item>
+        <item name="colorControlHighlight">@color/color_file_ppt_colorOnSurface</item>
+
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+
+    <!--Excel File-->
+    <style name="Theme.AllDocReader.Toolbar.XLX_Files" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Primary brand color. -->
+
+        <item name="colorPrimary">@color/color_file_xlx_colorPrimaryVariant</item>
+        <item name="colorPrimaryVariant">@color/color_file_xlx_colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:targetApi="o">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">true</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+
+        <!-- Customize your theme here. -->
+
+        <item name="android:outlineSpotShadowColor" tools:ignore="NewApi">
+            ?attr/colorControlHighlight
+        </item>
+        <item name="colorControlHighlight">@color/color_file_xlx_colorOnSurface</item>
+
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+
+    <!--XML File-->
+    <style name="Theme.AllDocReader.Toolbar.XML_Files" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Primary brand color. -->
+
+        <item name="colorPrimary">@color/color_file_xml_colorPrimaryVariant</item>
+        <item name="colorPrimaryVariant">@color/color_file_xml_colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:targetApi="o">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">true</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+
+        <!-- Customize your theme here. -->
+
+        <item name="android:outlineSpotShadowColor" tools:ignore="NewApi">
+            ?attr/colorControlHighlight
+        </item>
+        <item name="colorControlHighlight">@color/color_file_xml_colorOnSurface</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <!--HTML File-->
+    <style name="Theme.AllDocReader.Toolbar.HTML_Files" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Primary brand color. -->
+
+        <item name="colorPrimary">@color/color_file_html_colorPrimaryVariant</item>
+        <item name="colorPrimaryVariant">@color/color_file_html_colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:targetApi="o">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">true</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+
+        <!-- Customize your theme here. -->
+
+        <item name="android:outlineSpotShadowColor" tools:ignore="NewApi">
+            ?attr/colorControlHighlight
+        </item>
+        <item name="colorControlHighlight">@color/color_file_html_colorOnSurface</item>
+
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+
+    <!--CSV File-->
+    <style name="Theme.AllDocReader.Toolbar.CSV_Files" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Primary brand color. -->
+
+        <item name="colorPrimary">@color/color_file_rtf_colorPrimaryVariant</item>
+        <item name="colorPrimaryVariant">@color/color_file_rtf_colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:targetApi="o">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">true</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+
+        <!-- Customize your theme here. -->
+
+        <item name="android:outlineSpotShadowColor" tools:ignore="NewApi">
+            ?attr/colorControlHighlight
+        </item>
+        <item name="colorControlHighlight">@color/color_file_rtf_colorOnSurface</item>
+
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <!--JAVA File-->
+    <style name="Theme.AllDocReader.Toolbar.JAVA_Files" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Primary brand color. -->
+
+        <item name="colorPrimary">@color/color_file_epub_colorPrimaryVariant</item>
+        <item name="colorPrimaryVariant">@color/color_file_epub_colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:targetApi="o">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">true</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+
+        <!-- Customize your theme here. -->
+
+        <item name="android:outlineSpotShadowColor" tools:ignore="NewApi">
+            ?attr/colorControlHighlight
+        </item>
+        <item name="colorControlHighlight">@color/color_file_epub_colorOnSurface</item>
+
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <!--JSON File-->
+    <style name="Theme.AllDocReader.Toolbar.JSON_Files" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Primary brand color. -->
+
+        <item name="colorPrimary">@color/color_file_json_colorPrimaryVariant</item>
+        <item name="colorPrimaryVariant">@color/color_file_json_colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:targetApi="o">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">true</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+
+        <!-- Customize your theme here. -->
+
+        <item name="android:outlineSpotShadowColor" tools:ignore="NewApi">
+            ?attr/colorControlHighlight
+        </item>
+        <item name="colorControlHighlight">@color/color_file_json_colorOnSurface</item>
+
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+
+    <!--LOG File-->
+    <style name="Theme.AllDocReader.Toolbar.LOG_Files" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Primary brand color. -->
+
+        <item name="colorPrimary">@color/color_file_log_colorPrimaryVariant</item>
+        <item name="colorPrimaryVariant">@color/color_file_log_colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:targetApi="o">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">true</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+
+        <!-- Customize your theme here. -->
+        <item name="android:outlineSpotShadowColor" tools:ignore="NewApi">
+            ?attr/colorControlHighlight
+        </item>
+        <item name="colorControlHighlight">@color/color_file_log_colorOnSurface</item>
+
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <!--TEXT File-->
+    <style name="Theme.AllDocReader.Toolbar.TXT_Files" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Primary brand color. -->
+
+        <item name="colorPrimary">@color/color_file_txt_colorPrimaryVariant</item>
+        <item name="colorPrimaryVariant">@color/color_file_txt_colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:targetApi="o">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">true</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+
+        <!-- Customize your theme here. -->
+
+        <item name="android:outlineSpotShadowColor" tools:ignore="NewApi">
+            ?attr/colorControlHighlight
+        </item>
+        <item name="colorControlHighlight">@color/color_file_txt_colorOnSurface</item>
+
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+
+</resources>

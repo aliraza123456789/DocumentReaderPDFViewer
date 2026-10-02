@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="clickHandler"
+            type="android.view.View.OnClickListener" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/iv_header"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_152sdp"
+            android:background="@drawable/svg_language_header"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingTop="@dimen/_7sdp"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_25sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_2sdp"
+            android:ellipsize="end"
+            android:fontFamily="@font/font_constantian"
+            android:includeFontPadding="false"
+            android:maxLines="2"
+            android:text="@string/headPrivacy"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_28sdp"
+            app:layout_constraintEnd_toStartOf="@+id/iv_lock"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/iv_lock"
+            android:layout_width="@dimen/_80sdp"
+            android:layout_height="@dimen/_80sdp"
+            android:layout_marginEnd="@dimen/_5sdp"
+            android:layout_marginBottom="@dimen/_15sdp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="@dimen/_40sdp"
+            app:cardElevation="@dimen/_5sdp"
+            app:layout_constraintBottom_toBottomOf="@id/iv_header"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:strokeColor="@color/blue_100"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/_5sdp"
+                android:adjustViewBounds="true"
+                android:scaleType="centerInside"
+                android:src="@drawable/svg_privacy_lock"
+                tools:ignore="ContentDescription" />
+
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <ImageView
+            android:layout_width="@dimen/_32sdp"
+            android:layout_height="@dimen/_32sdp"
+            android:src="@drawable/svg_privacy_tick_circle"
+            android:translationZ="@dimen/_10sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_lock"
+            app:layout_constraintStart_toStartOf="@id/iv_lock"
+            tools:ignore="ContentDescription" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/_5sdp"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingTop="@dimen/_10sdp"
+            android:paddingBottom="@dimen/_10sdp"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toTopOf="@+id/btnPrivacyDecline"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_header">
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:fontFamily="sans-serif"
+                    android:lineSpacingExtra="@dimen/_5sdp"
+                    android:text="@string/ppDesc1"
+                    android:textColor="@color/black_700"
+                    android:textSize="@dimen/_12sdp"
+                    app:layout_constraintHorizontal_bias="0.0" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:fontFamily="sans-serif"
+                    android:lineSpacingExtra="@dimen/_5sdp"
+                    android:text="@string/ppDesc2"
+                    android:textColor="@color/black_700"
+                    android:textSize="@dimen/_12sdp"
+                    app:layout_constraintHorizontal_bias="0.0" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_15sdp"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/pp_h1_internet"
+                    android:textColor="@color/black_700"
+                    android:textSize="@dimen/_14sdp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:fontFamily="sans-serif"
+                    android:lineSpacingExtra="@dimen/_5sdp"
+                    android:text="@string/pp_p_internet"
+                    android:textColor="@color/black_700"
+                    android:textSize="@dimen/_12sdp"
+                    app:layout_constraintHorizontal_bias="0.0" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_15sdp"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/pp_h1_read_storage"
+                    android:textColor="@color/black_700"
+                    android:textSize="@dimen/_14sdp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:fontFamily="sans-serif"
+                    android:lineSpacingExtra="@dimen/_5sdp"
+                    android:text="@string/pp_p_read_storage"
+                    android:textColor="@color/black_700"
+                    android:textSize="@dimen/_12sdp"
+                    app:layout_constraintHorizontal_bias="0.0" />
+
+
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_15sdp"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/pp_h1_write_storage"
+                    android:textColor="@color/black_700"
+                    android:textSize="@dimen/_14sdp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:fontFamily="sans-serif"
+                    android:lineSpacingExtra="@dimen/_5sdp"
+                    android:text="@string/pp_p_write_storage"
+                    android:textColor="@color/black_700"
+                    android:textSize="@dimen/_12sdp"
+                    app:layout_constraintHorizontal_bias="0.0" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_15sdp"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/pp_h1_permission_required"
+                    android:textColor="@color/black_700"
+                    android:textSize="@dimen/_14sdp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:fontFamily="sans-serif"
+                    android:lineSpacingExtra="@dimen/_5sdp"
+                    android:text="@string/pp_p_permission_required"
+                    android:textColor="@color/black_700"
+                    android:textSize="@dimen/_12sdp"
+                    app:layout_constraintHorizontal_bias="0.0" />
+
+                <TextView
+                    android:id="@+id/textView9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_15sdp"
+                    android:fontFamily="sans-serif"
+                    android:lineSpacingExtra="@dimen/_5sdp"
+                    android:text="@string/pp_p_further_info"
+                    android:textColor="@color/black_700"
+                    android:textSize="@dimen/_12sdp"
+                    app:layout_constraintHorizontal_bias="0.0" />
+
+                <TextView
+                    android:id="@+id/tvLink"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:autoLink="web"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="sans-serif"
+                    android:linksClickable="true"
+                    android:onClick="@{(v)->clickHandler.onClick(v)}"
+                    android:textColor="@color/blue_700"
+                    android:textColorLink="@color/blue_700"
+                    android:textSize="@dimen/_12sdp" />
+
+
+                <CheckBox
+                    android:id="@+id/checkboxConfirmPrivacy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:buttonTint="@color/blue_700"
+                    android:fontFamily="sans-serif"
+                    android:gravity="center"
+                    android:text="@string/ppChecked"
+                    android:textColor="@color/blue_700"
+                    android:textSize="@dimen/_11sdp"
+
+                    />
+            </LinearLayout>
+        </ScrollView>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnPrivacyDecline"
+            android:layout_width="@dimen/_105sdp"
+            android:layout_height="49dp"
+            android:layout_marginStart="@dimen/_15sdp"
+            android:layout_marginBottom="@dimen/_8sdp"
+            android:background="@drawable/shape_button_primary_stroke"
+            android:elevation="@dimen/_4sdp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:maxLines="1"
+            android:onClick="@{(v)->clickHandler.onClick(v)}"
+            android:padding="@dimen/_2sdp"
+            android:text="@string/decline"
+            android:textAllCaps="true"
+            android:textColor="@color/text_selector_button_stroke"
+            android:textSize="@dimen/_13sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnPrivacyAccept"
+            android:layout_width="@dimen/_105sdp"
+            android:layout_height="49dp"
+            android:layout_marginEnd="@dimen/_15sdp"
+            android:layout_marginBottom="@dimen/_8sdp"
+            android:background="@drawable/shape_button_primary_solid"
+            android:elevation="@dimen/_4sdp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:maxLines="1"
+            android:onClick="@{(v)->clickHandler.onClick(v)}"
+            android:padding="@dimen/_2sdp"
+            android:text="@string/accept"
+            android:textAllCaps="true"
+            android:textColor="@color/text_selector_button_solid"
+            android:textSize="@dimen/_13sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="blue_30">#E6EDF6</color>
+    <color name="blue_50">#dbe9f6</color>
+    <color name="blue_100">#d1e4ff</color>
+    <color name="blue_200">#99267FFD</color>
+    <color name="blue_500">#066dff</color>
+    <color name="blue_700">#267ffd</color>
+
+
+    <color name="color_premium_card">#EFF6FF</color>
+    <color name="color_premium_card_stroke">#d1e4ff</color>
+    <color name="color_premium_tab_selected">#418af9</color>
+
+
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+
+    <color name="black_100">#707070</color>
+    <color name="black_200">#4e4c59</color>
+    <color name="black_500">#262626</color>
+    <color name="black_700">#263238</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="grey">#eaedf1</color>
+    <color name="colorOffWhite">#F6F6F6</color>
+    <color name="slate">#ebf0f9</color>
+    <color name="colorHint">#99FFFFFF</color>
+    <color name="transparent">#03000000</color>
+    <color name="premium_black_700">#001129</color>
+    <color name="premium_black_500">#010101</color>
+    <color name="premium_dark_blue_700">#002c6a</color>
+    <color name="color_file_all_backgroundColor">#f3f6fb</color>
+
+    <color name="transparent_700">#80000000</color>
+
+    <!--Pdf Colors-->
+    <color name="color_file_pdf_colorPrimaryVariant">#dc0000</color>
+    <color name="color_file_pdf_colorSurface">#F45454</color>
+    <color name="color_file_pdf_colorOnSurface">#fad6d6</color>
+    <color name="color_file_pdf_backgroundColor">#f9f5f5</color>
+
+    <!--Power Point Colors-->
+    <color name="color_file_ppt_colorPrimaryVariant">#e55708</color>
+    <color name="color_file_ppt_colorOnSurface">#fae3d6</color>
+    <color name="color_file_ppt_backgroundColor">#fcf7f4</color>
+
+    <!--Excel Colors-->
+    <color name="color_file_xlx_colorPrimaryVariant">#0cbf29</color>
+    <color name="color_file_xlx_colorOnSurface">#bdd1c0</color>
+    <color name="color_file_xlx_backgroundColor">#f6fff8</color>
+
+    <!--XML Colors-->
+    <color name="color_file_xml_colorPrimaryVariant">#398e3d</color>
+    <color name="color_file_xml_colorOnSurface">#bdd1c0</color>
+    <color name="color_file_xml_backgroundColor">#f8fff8</color>
+
+    <!--HTML Colors-->
+    <color name="color_file_html_colorPrimaryVariant">#989595</color>
+    <color name="color_file_html_colorOnSurface">#dfdede</color>
+    <color name="color_file_html_backgroundColor">#f9f8f8</color>
+
+
+    <!--CSV Colors-->
+    <color name="color_file_rtf_colorPrimaryVariant">#6a5caf</color>
+    <color name="color_file_rtf_colorOnSurface">#cbc6e3</color>
+    <color name="color_file_rtf_backgroundColor">#fdfcff</color>
+
+    <!--JAVA Colors-->
+    <color name="color_file_epub_colorPrimaryVariant">#61abe6</color>
+    <color name="color_file_epub_colorOnSurface">#d3e8f8</color>
+    <color name="color_file_epub_backgroundColor">#fdfcff</color>
+
+    <!--JSON Colors-->
+    <color name="color_file_json_colorPrimaryVariant">#004aad</color>
+    <color name="color_file_json_colorOnSurface">#CEE1FA</color>
+    <color name="color_file_json_backgroundColor">#F8F9FA</color>
+
+
+    <!--LOG Colors-->
+    <color name="color_file_log_colorPrimaryVariant">#fbcf54</color>
+    <color name="color_file_log_colorOnSurface">#FBECC0</color>
+    <color name="color_file_log_backgroundColor">#FDFCF6</color>
+
+    <!--TEXT Colors-->
+    <color name="color_file_txt_colorPrimaryVariant">#0cbf9a</color>
+    <color name="color_file_txt_colorOnSurface">#a8c1bc</color>
+    <color name="color_file_txt_backgroundColor">#f5fefc</color>
+
+
+    <!--    <color name="colorPrimary">#333d49</color>
+        <color name="colorPrimaryLight">#5b636d</color>
+        <color name="colorPrimaryDark">#0d1723</color>
+        <color name="colorTextPrimaryDark">#777f88</color>
+        <color name="colorTextPrimary">#80868f</color>
+        <color name="colorTextSecondary">#aeb0b2</color>-->
+    <color name="colorTabSelected">#FFFFFF</color>
+    <color name="colorTabUnSelected">#B3FFFFFF</color>
+    <color name="colorLink">#40C4FF</color>
+</resources>

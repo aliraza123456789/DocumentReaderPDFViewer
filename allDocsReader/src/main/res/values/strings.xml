@@ -1,0 +1,243 @@
+<resources>
+
+
+    <string name="afrikaans" translatable="false">Afrikaans</string>
+    <string name="amharic" translatable="false">Amharic</string>
+    <string name="basque" translatable="false">Basque</string>
+    <string name="bulgarian" translatable="false">Bulgarian</string>
+    <string name="czech" translatable="false">Czech</string>
+    <string name="chinies" translatable="false">Chinese</string>
+    <string name="danish" translatable="false">Danish</string>
+    <string name="dutch" translatable="false">Dutch</string>
+    <string name="english" translatable="false">English</string>
+    <string name="estonian" translatable="false">Estonian</string>
+    <string name="filipino" translatable="false">Filipino</string>
+    <string name="finish" translatable="false">Finish</string>
+    <string name="german" translatable="false">German</string>
+    <string name="georgian" translatable="false">Georgian</string>
+    <string name="hindi" translatable="false">Hindi</string>
+    <string name="hungarian" translatable="false">Hungarian</string>
+    <string name="icelandic" translatable="false">Icelandic</string>
+    <string name="indonesian" translatable="false">Indonesian</string>
+    <string name="italian" translatable="false">Italian</string>
+    <string name="japanese" translatable="false">Japanese</string>
+    <string name="kannada" translatable="false">Kannada</string>
+    <string name="kazakh" translatable="false">Kazakh</string>
+    <string name="lao" translatable="false">Laothian</string>
+    <string name="latin" translatable="false">Latin</string>
+    <string name="macedonian" translatable="false">Macedonian</string>
+    <string name="malay" translatable="false">Malay</string>
+    <string name="polish" translatable="false">Polish</string>
+    <string name="portuguese" translatable="false">Portuguese</string>
+    <string name="russian" translatable="false">Russian</string>
+    <string name="spanish" translatable="false">Spanish</string>
+    <string name="swedish" translatable="false">Swedish</string>
+    <string name="turkish" translatable="false">Turkish</string>
+    <string name="vietnamese" translatable="false">Veitnamese</string>
+
+    <string name="privacy_policy_linkText" translatable="false">
+        <![CDATA[<a href="">https://sites.google.com</a>
+]]></string>
+    <string name="privacy_policy_URL" translatable="false">https://sites.google.com</string>
+
+
+
+    <string name="app_name">All File Reader</string>
+    <string name="about_app">About App</string>
+    <string name="home">Home</string>
+    <string name="delete">Delete</string>
+    <string name="share">Share</string>
+    <string name="selected">Selected</string>
+    <string name="selectAll">Select All</string>
+    <string name="rename">Rename</string>
+    <string name="detail">Detail</string>
+    <string name="rename_file">Rename File</string>
+    <string name="enter_name">Enter new file name…</string>
+    <string name="file">File</string>
+    <string name="files">Files</string>
+    <string name="title_intro_slides">About App</string>
+    <string name="title_external_files">Open External files</string>
+    <string name="title_fav_files">Favorite Documents</string>
+    <string name="title_exit_app">Close app</string>
+    <string name="title_change_language">Change Language</string>
+    <string name="title_share_app">Share App</string>
+    <string name="btn_no">Not Now</string>
+    <string name="bt_yes">Yes</string>
+    <string name="ok">OK</string>
+    <string name="title_home_all_files">All Files</string>
+    <string name="title_home_pdf_files">PDF Files</string>
+    <string name="title_home_power_point_files">Power Point Files</string>
+    <string name="title_home_excel_files">Excel Files</string>
+    <string name="title_home_word_files">Word Files</string>
+    <string name="title_home_csv_files">CSV Files</string>
+    <string name="title_home_html_files">HTML Files</string>
+    <string name="title_home_xml_files">XML Files</string>
+    <string name="title_home_java_files">JAVA Files</string>
+    <string name="title_home_json_files">JSON Files</string>
+    <string name="title_home_log_files">LOG Files</string>
+    <string name="title_home_text_files">Text Files</string>
+    <string name="title_language">Languages</string>
+    <string name="title_splash_header">All Document\nManager</string>
+    <string name="bt_visit_app">Visit App</string>
+    <string name="bt_not_now">Not Now</string>
+    <string name="bt_manage">Manage</string>
+    <string name="free_space">Free Space</string>
+    <string name="total_space">Total Space</string>
+    <string name="bt_fav_docs">Favourite\nDocs</string>
+    <string name="msg_toast_files_loading">Please Wait , While loading is being complete.</string>
+    <string name="title_dialog_already_premium">You are a premium member</string>
+    <string name="title_premium_access">Premium Access</string>
+    <string name="p_no_ads">No Ads</string>
+    <string name="p_access_to_premium_files">Access to all premium files</string>
+    <string name="p_select_plan_below">Select your favourite plane below</string>
+    <string name="bt_sub_now">Subscribe Now</string>
+    <string name="bt_manage_sub">Manage Subscriptions</string>
+    <string name="search_files">Search File…</string>
+    <string name="msg_file_rename">File we be renamed permanently, you can\'t undo this.</string>
+    <string name="title_file_info">File Information</string>
+    <string name="path">Path</string>
+    <string name="name">Name</string>
+    <string name="mimetype">MimeType</string>
+    <string name="size">Size</string>
+    <string name="modified_on">Modified On</string>
+    <string name="location">Files (%1$s)</string>
+    <string name="p_try_free_trail">Try %1$s for free, Then %2$s/%3$s</string>
+    <string name="msg_congrat_default">Congratulations, you are now premium user</string>
+    <string name="msg_thanks">Thanks For Upgrading</string>
+    <string name="bt_go_back">Go to home</string>
+    <string name="exit">Exit</string>
+    <string name="next">Next</string>
+    <string name="gotit">Got,It</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="allow">Allow</string>
+    <string name="noThanks">No Thanks</string>
+    <string name="pleaseWait">Please Wait</string>
+    <string name="cancel">Cancel</string>
+    <string name="rateApp">Rate App</string>
+    <string name="exitAppMsg">If you like the app, Please take a moment to rate our app on play store.</string>
+    <string name="search">Search</string>
+    <string name="ppChecked">I Read and Understood.</string>
+    <string name="decline">Decline</string>
+    <string name="accept">Accept</string>
+    <string name="skip">Skip</string>
+    <string name="title_languages">Languages</string>
+    <string name="title_select_language">Select a language</string>
+    <string name="introHead1">All Document Reader</string>
+
+    <string name="headConsentForm">Data Protection Consent</string>
+    <string name="btnContinue">Yes, Continue to see ads</string>
+    <string name="headPrivacy">Privacy\nPolicies</string>
+    <string name="pp_h1_internet">\u25CF  ACCESS_INTERNET</string>
+    <string name="pp_h1_read_storage">\u25CF  READ_EXTERNAL_STORAGE</string>
+    <string name="pp_h1_write_storage">\u25CF  WRITE_EXTERNAL_STORAGE</string>
+    <string name="pp_h1_permission_required">Permissions required:</string>
+    <string name="dailogMsgExit">Are you sure you want to exit.!</string>
+    <string name="title_un_able_open">Unable to open</string>
+    <string name="msg_un_able_open">was corrupt, deleted, moved or renamed. File viewer cannot open such type of file.</string>
+    <string name="dialogMsgFilesFetching">While app is retrieving files from external storage.</string>
+    <string name="dl_storage_permission_heading">Grant Storage Permission</string>
+    <string name="full_screen_view">Full Screen View</string>
+    <string name="title_finde_page">Go to Page</string>
+    <string name="bt_jump">Jump</string>
+    <string name="ads_removed">Ads removed</string>
+    <string name="access_to_all_files">Access to all files</string>
+    <string name="msg_no_search_found">No Such File Found.</string>
+    <string name="msg_no_file_found">Sorry, No Files Found</string>
+    <string name="update_success">App updated successfully.</string>
+    <string name="bt_remove_ads_now">Remove Ads Now</string>
+    <string name="view_more">View More Detail</string>
+    <string name="pleas_wait">Please Wait…</string>
+    <string name="lets_start">Let\'s Get Started</string>
+    <string name="introHead4">Choice of Millions</string>
+    <string name="bt_read_privacy">Read Privacy</string>
+    <string name="wait">Wait</string>
+    <string name="msg_rendering_files">File rendering in process.</string>
+    <string name="tab_text_1">One Time</string>
+    <string name="tab_text_2">Subscriptions</string>
+    <string name="price_per_period">per %1$s</string>
+    <string name="title_privacy_policy">Privacy Policy</string>
+    <string name="msg_ad_loading">Ad loading, Please wait…</string>
+    <string name="title_upgrade_premium">Upgrade\nto Premium</string>
+    <string name="tab_premium_one_time">One Time</string>
+    <string name="tab_premium_plans">Plans</string>
+    <string name="one_time_payment">One time payment</string>
+    <string name="features">Features</string>
+    <string name="premium_remove_all_ads">Remove all ads</string>
+    <string name="premium_access_files">Access to all premium files</string>
+    <string name="no_product_found">Sorry, No product found yet.</string>
+    <string name="bt_buy_now">Buy Now</string>
+    <string name="title_dialoge_purchase_cong">Wow!\nYou\'ve made it..</string>
+    <string name="alert_internet_required">Sorry , Internet connection is required.</string>
+    <string name="title_nav_upgrade_premium">Upgrade to Premium</string>
+    <string name="alert_h1_delete_file">Delete File!</string>
+    <string name="alert_h1_delete_files">Delete Selected Files!</string>
+    <string name="alert_msg_delete_file">You are about to delete this file. You can’t undo this action.\nDo you want to continue?</string>
+    <string name="alert_msg_delete_files">You are about to delete multiple selected files. You can’t undo this action.\nDo you want to continue?</string>
+    <string name="title_annoying_ads">Is Ads Annoying!</string>
+    <string name="bt_show_rewarded">Watch the video</string>
+    <string name="title_home_header">Home</string>
+    <string name="title_show_reward">Reward</string>
+
+
+    <string name="msg_ads_removed">Congratulations, all ads are removed</string>
+    <string name="title_reward">Get the Reward</string>
+    <string name="msg_dialog_reward">Watch this video to get a reward to have one time ad free experience.</string>
+    <string name="alert_msg_no_internet">Sorry , Internet connection is required.</string>
+    <string name="title_h2_premium">Payment plans</string>
+    <string name="alert_msg_failed_buy">Failed to buy product</string>
+    <string name="alert_msg_select_plan_first">Please select any plane first</string>
+    <string name="msg_no_plan">Sorry, No plane found yet.</string>
+    <string name="alert_msg_no_reward">Sorry, you are failed to get reward</string>
+    <string name="alert_msg_reward_success">Congratulations, You are rewarded to have one time ad-free experience</string>
+    <string name="alert_msg_rename_success">File renamed successfully to </string>
+    <string name="hint_enter_name">Enter file name first.</string>
+    <string name="alert_msg_wait_Loading_video">Please wait, video is loading.</string>
+    <string name="alert_title_no_page">No Page Found</string>
+    <string name="alert_msg_no_pdf_to_render">Pdf have no page to render on screen.</string>
+    <string name="msg_dialog_already_premium">You have already subscribed to an active premium subscription. This membership plan is auto-renewable at end of the period. If you want to change your plan, see more details or cancel premium subscription, Visit Manage subscriptions on play store.</string>
+    <string name="msg_exit_app">If you like our app please take a moment to rate our app on play store.</string>
+    <string name="p_sub_policy">According to subscription policy, you will charged after purchase or after the free trial period is end. An auto renewable subscription will be activated at the end to the selected period. You can manage or cancel it any time from google play subscription options</string>
+    <string name="p_sub_note">Note: You will be charged at the time of subscription. This subscription is auto-renewable at end of the selected period. If you no longer wish to have access to the premium features, you can cancel your premium subscription anytime.\nVisit Manage Subscription to manage or cancel your subscription on google play store subscription options.</string>
+    <string name="p_sub_congrate">You have successfully subscribed to premium plan %1$s renew automatically at the end of subscription period\nYou can cancel it any time from google play subscription option.</string>
+    <string name="p_purchase_congrade">Congratulations,\nYour now a premium user enjoy ad free app and have full access to all premium files.\nYou can manage your purchases from google play manage purchase option</string>
+    <string name="introDesc1">View &amp; Read all your documents available in your smart phone at one place</string>
+
+    <string name="ppDesc1">The purpose of this privacy policy is to inform you of our policies regarding the collection, use, and disclosure of personal data. We respect your privacy and determine to protect your personal data.</string>
+    <string name="ppDesc2">To provide better user experience, Following permissions are requested:</string>
+    <string name="dialog_purchase_default_note">You can manage or cancel it any time from google play subscription option</string>
+    <string name="p_purchase_congrate_note_">You are now a premium user.\nYou can manage your purchases any time from google account manage purchases option.</string>
+    <string name="msg_annoying_ads">Get Rid of Annoying Ads and enjoy ad-free experience and access to premium files.</string>
+    <string name="introDesc4">No#1 choice of 5 Million plus users.\nPowerful office suite trusted by millions</string>
+    <string name="descConsentOne"> Our app are displaying ads that support our work and enable further development of this app, We need your consent to use your data to serve ads tailored for you.</string>
+    <string name="descConsentTwo">Can we continue to receive your data to tailor ads for you?</string>
+    <string name="p_sub_congrate_note_">Subscription will automatically renew at the end of existing plane for %1$s.\nYou can manage or cancel it any time from google play subscription option.</string>
+    <string name="pp_p_internet">This allows the app to retrieve adverts to display in this app through internet</string>
+    <string name="pp_p_read_storage">This allows the app to access &amp; read documents from user device storage </string>
+    <string name="pp_p_write_storage">This allows the app to save documents created by this app into your device storage</string>
+    <string name="pp_p_permission_required">These permissions are required in order to work properly for the user. To continue using our app &amp; services, you must accept our privacy policies.</string>
+    <string name="pp_p_further_info">For Further details about how this app handles these permissions, please visit the privacy policy at below link.</string>
+
+    <string name="ms_find_page">Choose your desired page number to jump to a specific page in this PDF.</string>
+    <string name="note_promotion_notification">If you wish to continue, you’ll be redirected to google play store.\nDo you want to continue?</string>
+
+    <string name="msg_splash">Powered by AppStan Studio</string>
+    <string name="introHead2">Office Files Formats</string>
+    <string name="introHead3">PDF Reader</string>
+    <string name="introDesc2">Open and view all type of office file formats in your smart phone</string>
+    <string name="introDesc3">Powerful tool to read all you PDF file at one place</string>
+
+    <string name="dl_storage_permission_message_11">It seems that you denied permission before but in order to show and read document files app required storage permission.\nAllow from settings.</string>
+    <string name="dl_storage_permission_message">All document manager required phone storage permission in order to show and read document files.</string>
+    <string name="btn_settings">Settings</string>
+    <string name="advertisement_placement">Advertisment Placement</string>
+    <string name="welcome_message">Welcome Back</string>
+    <string name="loading_an_ad">Loading an Ad..</string>
+
+    <!-- Resources used by the legacy document-reader UI. -->
+    <string name="sys_share_title" translatable="false">Share</string>
+    <string name="sys_url_wxiwei" translatable="false">https://sites.google.com</string>
+    <string name="pg_toolsbar_note" translatable="false">Notes</string>
+    <string name="sys_button_ok" translatable="false">OK</string>
+
+</resources>
