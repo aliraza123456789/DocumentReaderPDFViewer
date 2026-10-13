@@ -79,6 +79,43 @@ class AdMobManager @Inject constructor() {
             val value = adValues[key] ?: return defaultValue
             return value.equals("true", ignoreCase = true)
         }
+
+        @Volatile
+        private var preloadedNativeAd: com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd? = null
+        @Volatile
+        private var isNativeLoading: Boolean = false
+
+        fun preloadNativeAd(context: Context) {
+            if (!isAdEnabled(KEY_FILE_READER_NATIVE) || preloadedNativeAd != null || isNativeLoading) return
+            isNativeLoading = true
+            val targetId = getNativeId(context)
+            val request = com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdRequest.Builder(
+                targetId,
+                listOf(com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd.NativeAdType.NATIVE)
+            ).build()
+            com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdLoader.load(
+                request,
+                object : com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdLoaderCallback {
+                    override fun onNativeAdLoaded(ad: com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd) {
+                        isNativeLoading = false
+                        preloadedNativeAd?.destroy()
+                        preloadedNativeAd = ad
+                        Log.d(TAG, "Preloaded Native Ad ready")
+                    }
+
+                    override fun onAdFailedToLoad(error: com.google.android.libraries.ads.mobile.sdk.common.LoadAdError) {
+                        isNativeLoading = false
+                        Log.w(TAG, "Failed to preload Native Ad: ${error.message}")
+                    }
+                }
+            )
+        }
+
+        fun consumePreloadedNativeAd(): com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd? {
+            val ad = preloadedNativeAd
+            preloadedNativeAd = null
+            return ad
+        }
     }
 
     private var isInitialized = false
@@ -92,6 +129,7 @@ class AdMobManager @Inject constructor() {
                 MobileAds.initialize(context, config)
                 isInitialized = true
                 Log.d(TAG, "GMA Next-Gen MobileAds initialized successfully with App ID: $appId")
+                preloadNativeAd(context)
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to initialize Next-Gen MobileAds", e)
             }

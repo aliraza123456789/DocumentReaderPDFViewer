@@ -258,10 +258,13 @@ class UnlockPdfViewModel @Inject constructor(
                 )
             }
 
+            val minDisplayTimeMs = 4500L
+            val startTime = System.currentTimeMillis()
+
             try {
                 // Progressive progress animation
-                for (p in 15..70 step 15) {
-                    delay(50)
+                for (p in 15..85 step 10) {
+                    delay(60)
                     _state.update { it.copy(unlockProgress = p) }
                 }
 
@@ -294,10 +297,17 @@ class UnlockPdfViewModel @Inject constructor(
                     null
                 )
 
-                for (p in 75..100 step 10) {
+                // Hold dialog so user can see Native Ad for fixed duration
+                val elapsed = System.currentTimeMillis() - startTime
+                if (elapsed < minDisplayTimeMs) {
+                    delay(minDisplayTimeMs - elapsed)
+                }
+
+                for (p in 88..100 step 4) {
                     delay(30)
                     _state.update { it.copy(unlockProgress = p) }
                 }
+                delay(400)
 
                 _state.update {
                     it.copy(

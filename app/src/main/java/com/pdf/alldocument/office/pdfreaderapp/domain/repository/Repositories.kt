@@ -31,6 +31,7 @@ interface PdfToolsRepository {
     suspend fun organizeAndExportPdf(originalPdfPath: String, selectedPages: List<Int>, outputFileName: String): Result<String>
     suspend fun renderAllPagesToBitmaps(filePath: String): List<Bitmap>
     suspend fun lockPdf(originalPdfPath: String, password: String, outputFileName: String): Result<String>
+    suspend fun validatePdf(filePath: String): Result<Unit>
 }
 
 interface UserPrefsRepository {

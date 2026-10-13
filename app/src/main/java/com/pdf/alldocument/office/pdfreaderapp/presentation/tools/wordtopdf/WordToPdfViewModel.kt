@@ -13,6 +13,7 @@ import com.pdf.alldocument.office.pdfreaderapp.presentation.tools.officetopdf.Of
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -134,6 +135,9 @@ class WordToPdfViewModel @Inject constructor(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
+            val minDisplayTimeMs = 4500L
+            val startTime = System.currentTimeMillis()
+
             try {
                 val outFile = FileUtils.newOutputFile(context, targetName, "pdf")
                 val kind = engine.kindOf(selected.name) ?: OfficeToPdfEngine.Kind.DOCX
@@ -152,9 +156,21 @@ class WordToPdfViewModel @Inject constructor(
                     kind = kind,
                     output = outFile,
                     onProgress = { p ->
-                        _state.update { it.copy(conversionProgress = p) }
+                        _state.update { it.copy(conversionProgress = p.coerceIn(0, 90)) }
                     }
                 )
+
+                // Hold dialog so user can see Native Ad for fixed duration
+                val elapsed = System.currentTimeMillis() - startTime
+                if (elapsed < minDisplayTimeMs) {
+                    delay(minDisplayTimeMs - elapsed)
+                }
+
+                for (p in _state.value.conversionProgress..100 step 4) {
+                    delay(25)
+                    _state.update { it.copy(conversionProgress = p.coerceAtMost(100)) }
+                }
+                delay(400)
 
                 _state.update {
                     it.copy(

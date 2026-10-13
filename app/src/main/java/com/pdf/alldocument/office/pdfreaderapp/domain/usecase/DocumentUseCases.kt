@@ -60,3 +60,11 @@ class OrganizePdfUseCase @Inject constructor(
         return toolsRepository.organizeAndExportPdf(originalPdfPath, selectedPages, outputFileName)
     }
 }
+
+class ValidatePdfUseCase @Inject constructor(
+    private val toolsRepository: PdfToolsRepository
+) {
+    suspend operator fun invoke(filePath: String): Result<Unit> {
+        return toolsRepository.validatePdf(filePath)
+    }
+}

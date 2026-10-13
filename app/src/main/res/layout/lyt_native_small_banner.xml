@@ -72,7 +72,7 @@
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:layout_marginEnd="4dp"
-            android:backgroundTint="#4F46E5"
+            android:backgroundTint="#00C853"
             android:minWidth="75dp"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"

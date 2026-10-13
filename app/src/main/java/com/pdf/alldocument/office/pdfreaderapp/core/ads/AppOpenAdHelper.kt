@@ -26,6 +26,7 @@ class AppOpenAdHelper @Inject constructor(
     companion object {
         private const val TAG = "AppOpenAdHelper"
         var isAlreadyShowingAd = false
+        var lastInterstitialDismissedTime: Long = 0L
     }
 
     private var appOpenAd: AppOpenAd? = null
@@ -48,9 +49,9 @@ class AppOpenAdHelper @Inject constructor(
             return
         }
 
-        // Never show App Open Ad while an Interstitial Ad is showing or requested
-        if (AdMobManager.isInterstitialShowing || isAlreadyShowingAd) {
-            Log.d(TAG, "Skipping App Open ad because Interstitial/another ad is currently visible.")
+        // Never show App Open Ad while an Interstitial Ad is showing or was just dismissed
+        if (AdMobManager.isInterstitialShowing || isAlreadyShowingAd || (System.currentTimeMillis() - lastInterstitialDismissedTime < 3000L)) {
+            Log.d(TAG, "Skipping App Open ad because Interstitial/another ad is currently visible or recently closed.")
             return
         }
 

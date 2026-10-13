@@ -1,5 +1,6 @@
 package com.pdf.alldocument.office.pdfreaderapp.presentation.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,11 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pdf.alldocument.office.pdfreaderapp.R
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.BrandPurple
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.ConfirmDeleteDialog
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.RenameDialog
@@ -86,32 +89,28 @@ fun HomeScreen(
     // Collect side effects
     LaunchedEffect(Unit) {
         viewModel.onEvent(HomeEvent.RefreshRequested)
-        viewModel.effects.collectLatest { effect ->
+        viewModel.effects.collect { effect ->
             when (effect) {
                 is HomeEffect.NavigateToPdfViewer -> {
+                    onNavigateToPdfViewer(effect.document)
                     val adKey = com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager.KEY_PDF_INTERNAL_INTER
                     if (activity != null) {
                         viewModel.interstitialAdHelper.showAd(
                             activity = activity,
                             adKey = adKey,
-                            frequencyEveryClicks = 2,
-                            onAdDismissed = { onNavigateToPdfViewer(effect.document) }
+                            frequencyEveryClicks = 2
                         )
-                    } else {
-                        onNavigateToPdfViewer(effect.document)
                     }
                 }
                 is HomeEffect.NavigateToOfficeViewer -> {
+                    onNavigateToOfficeViewer(effect.document)
                     val adKey = com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager.KEY_ALL_INTERNAL_INTER
                     if (activity != null) {
                         viewModel.interstitialAdHelper.showAd(
                             activity = activity,
                             adKey = adKey,
-                            frequencyEveryClicks = 2,
-                            onAdDismissed = { onNavigateToOfficeViewer(effect.document) }
+                            frequencyEveryClicks = 2
                         )
-                    } else {
-                        onNavigateToOfficeViewer(effect.document)
                     }
                 }
                 is HomeEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
@@ -266,12 +265,23 @@ private fun HomeTopBar(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // App Icon
+        Image(
+            painter = painterResource(id = R.drawable.splash_pdf_icon),
+            contentDescription = "App Icon",
+            modifier = Modifier
+                .size(42.dp)
+                .clip(RoundedCornerShape(10.dp))
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
         // LEFT — title + subtitle
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "My Documents",
+                text = "Document Reader",
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
+                fontSize = 19.sp,
                 color = Color(0xFF111827)
             )
             Text(

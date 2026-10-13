@@ -59,16 +59,16 @@ class InterstitialAdHelper @Inject constructor(
         activity: Activity,
         adKey: String = AdMobManager.KEY_ALL_INTERNAL_INTER,
         frequencyEveryClicks: Int = 1,
-        onAdDismissed: () -> Unit
+        onAdDismissed: () -> Unit = {}
     ) {
         if (isPremiumUser || !AdMobManager.isAdEnabled(adKey)) {
-            onAdDismissed()
+            activity.runOnUiThread { onAdDismissed() }
             return
         }
 
         actionCounter++
         if (actionCounter < frequencyEveryClicks) {
-            onAdDismissed()
+            activity.runOnUiThread { onAdDismissed() }
             return
         }
         actionCounter = 0 // Reset counter
@@ -80,16 +80,22 @@ class InterstitialAdHelper @Inject constructor(
                     interstitialAd = null
                     AdMobManager.isInterstitialShowing = false
                     AppOpenAdHelper.isAlreadyShowingAd = false
+                    AppOpenAdHelper.lastInterstitialDismissedTime = System.currentTimeMillis()
                     loadAd(activity)
-                    onAdDismissed()
+                    activity.runOnUiThread {
+                        onAdDismissed()
+                    }
                 }
 
                 override fun onAdFailedToShowFullScreenContent(error: FullScreenContentError) {
                     interstitialAd = null
                     AdMobManager.isInterstitialShowing = false
                     AppOpenAdHelper.isAlreadyShowingAd = false
+                    AppOpenAdHelper.lastInterstitialDismissedTime = System.currentTimeMillis()
                     loadAd(activity)
-                    onAdDismissed()
+                    activity.runOnUiThread {
+                        onAdDismissed()
+                    }
                 }
 
                 override fun onAdShowedFullScreenContent() {
@@ -101,7 +107,7 @@ class InterstitialAdHelper @Inject constructor(
             ad.show(activity)
         } else {
             loadAd(activity)
-            onAdDismissed()
+            activity.runOnUiThread { onAdDismissed() }
         }
     }
 }

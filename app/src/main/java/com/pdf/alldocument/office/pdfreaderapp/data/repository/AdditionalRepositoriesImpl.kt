@@ -47,6 +47,10 @@ class PdfToolsRepositoryImpl @Inject constructor(
     ): Result<String> {
         return pdfToolsManager.lockPdf(originalPdfPath, password, outputFileName)
     }
+
+    override suspend fun validatePdf(filePath: String): Result<Unit> {
+        return pdfToolsManager.validatePdf(filePath)
+    }
 }
 
 @Singleton

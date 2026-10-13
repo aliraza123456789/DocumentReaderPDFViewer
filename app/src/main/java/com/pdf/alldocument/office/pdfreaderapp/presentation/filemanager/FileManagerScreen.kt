@@ -73,29 +73,25 @@ fun FileManagerRoute(
         viewModel.effects.collect { effect ->
             when (effect) {
                 is FileManagerEffect.NavigateToPdfViewer -> {
+                    onNavigateToPdfViewer(effect.document)
                     val adKey = com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager.KEY_PDF_INTERNAL_INTER
                     if (activity != null) {
                         viewModel.interstitialAdHelper.showAd(
                             activity = activity,
                             adKey = adKey,
-                            frequencyEveryClicks = 2,
-                            onAdDismissed = { onNavigateToPdfViewer(effect.document) }
+                            frequencyEveryClicks = 2
                         )
-                    } else {
-                        onNavigateToPdfViewer(effect.document)
                     }
                 }
                 is FileManagerEffect.NavigateToOfficeViewer -> {
+                    onNavigateToOfficeViewer(effect.document)
                     val adKey = com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager.KEY_ALL_INTERNAL_INTER
                     if (activity != null) {
                         viewModel.interstitialAdHelper.showAd(
                             activity = activity,
                             adKey = adKey,
-                            frequencyEveryClicks = 2,
-                            onAdDismissed = { onNavigateToOfficeViewer(effect.document) }
+                            frequencyEveryClicks = 2
                         )
-                    } else {
-                        onNavigateToOfficeViewer(effect.document)
                     }
                 }
                 is FileManagerEffect.ShowMessage -> snackbarHostState.showSnackbar(effect.message)

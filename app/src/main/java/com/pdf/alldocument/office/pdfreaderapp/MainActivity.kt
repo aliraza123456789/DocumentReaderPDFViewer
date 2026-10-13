@@ -27,11 +27,14 @@ import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.lifecycleScope
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.DocumentReaderTheme
 import com.pdf.alldocument.office.pdfreaderapp.core.update.InAppUpdateManager
 import com.pdf.alldocument.office.pdfreaderapp.presentation.navigation.AppNavigation
 import com.pdf.alldocument.office.pdfreaderapp.presentation.navigation.Screen
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import javax.inject.Inject
 
@@ -41,9 +44,14 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var inAppUpdateManager: InAppUpdateManager
 
+    private val pendingExternalPdf = kotlinx.coroutines.flow.MutableStateFlow<com.pdf.alldocument.office.pdfreaderapp.core.util.UriUtils.ParsedFileInfo?>(null)
+
     @OptIn(ExperimentalSerializationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        handleIncomingIntent(intent)
+
         // True edge-to-edge: both bars stay transparent so app content draws
         // behind them. Icon contrast is handled by DocumentReaderTheme via
         // WindowInsetsController (the app is light-only).
@@ -74,6 +82,24 @@ class MainActivity : ComponentActivity() {
                 // Track if permissions have been checked/requested for MainActivity main screen
                 var hasRequestedPermissionOnMainScreen by rememberSaveable { mutableStateOf(false) }
 
+                // Navigate directly to viewer if an external PDF was opened
+                LaunchedEffect(Unit) {
+                    pendingExternalPdf.collect { fileInfo ->
+                        if (fileInfo != null) {
+                            navController.navigate(
+                                Screen.PdfViewer(
+                                    filePath = fileInfo.filePath,
+                                    title = fileInfo.displayName
+                                )
+                            ) {
+                                // Pop Splash so back button doesn't loop back to splash
+                                popUpTo(Screen.Splash) { inclusive = true }
+                            }
+                            pendingExternalPdf.value = null
+                        }
+                    }
+                }
+
                 // Request permissions ONLY when the user reaches the main screen (Screen.Home),
                 // NEVER during SplashScreen, PrivacyPolicy, or Onboarding.
                 LaunchedEffect(currentRoute) {
@@ -94,6 +120,27 @@ class MainActivity : ComponentActivity() {
                 ) {
                     AppNavigation(navController = navController)
                 }
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIncomingIntent(intent)
+    }
+
+    private fun handleIncomingIntent(intent: Intent?) {
+        if (intent == null || intent.action != Intent.ACTION_VIEW) return
+        val uri = intent.data ?: return
+        
+        lifecycleScope.launch(Dispatchers.IO) {
+            val resolved = com.pdf.alldocument.office.pdfreaderapp.core.util.UriUtils.resolveUriToFile(
+                this@MainActivity,
+                uri
+            )
+            if (resolved != null) {
+                pendingExternalPdf.value = resolved
             }
         }
     }

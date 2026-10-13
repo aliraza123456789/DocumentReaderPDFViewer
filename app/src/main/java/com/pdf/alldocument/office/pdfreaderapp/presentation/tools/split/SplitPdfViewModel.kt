@@ -232,13 +232,16 @@ class SplitPdfViewModel @Inject constructor(
             val baseName = doc.name.substringBeforeLast('.', "Business Plan")
             val totalParts = current.splitParts.size
 
+            val minDisplayTimeMs = 4500L
+            val startTime = System.currentTimeMillis()
+
             try {
                 for ((index, part) in current.splitParts.withIndex()) {
                     // Gradual visual progress
-                    val targetProgress = ((index + 1) * 90) / totalParts
+                    val targetProgress = ((index + 1) * 85) / totalParts
                     for (p in (_state.value.splitProgress + 5)..targetProgress step 5) {
-                        _state.update { it.copy(splitProgress = p.coerceIn(5, 95)) }
-                        delay(40)
+                        _state.update { it.copy(splitProgress = p.coerceIn(5, 90)) }
+                        delay(50)
                     }
 
                     val partFileName = if (totalParts == 1) {
@@ -269,12 +272,18 @@ class SplitPdfViewModel @Inject constructor(
                     }
                 }
 
+                // Hold dialog so user can see Native Ad for fixed duration
+                val elapsed = System.currentTimeMillis() - startTime
+                if (elapsed < minDisplayTimeMs) {
+                    delay(minDisplayTimeMs - elapsed)
+                }
+
                 // Final stretch to 100%
                 for (p in _state.value.splitProgress..100 step 2) {
                     _state.update { it.copy(splitProgress = p.coerceAtMost(100)) }
                     delay(20)
                 }
-                delay(300)
+                delay(400)
 
                 _state.update {
                     it.copy(

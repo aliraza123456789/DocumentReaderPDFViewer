@@ -11,6 +11,7 @@ import com.pdf.alldocument.office.pdfreaderapp.domain.model.SortOrder
 import com.pdf.alldocument.office.pdfreaderapp.domain.repository.DocumentRepository
 import com.pdf.alldocument.office.pdfreaderapp.domain.usecase.GetDocumentsUseCase
 import com.pdf.alldocument.office.pdfreaderapp.domain.usecase.MergePdfUseCase
+import com.pdf.alldocument.office.pdfreaderapp.domain.usecase.ValidatePdfUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -51,6 +52,7 @@ data class MergePdfState(
 @HiltViewModel
 class MergePdfViewModel @Inject constructor(
     private val mergePdfUseCase: MergePdfUseCase,
+    private val validatePdfUseCase: ValidatePdfUseCase,
     private val getDocumentsUseCase: GetDocumentsUseCase,
     private val documentRepository: DocumentRepository
 ) : ViewModel() {
@@ -106,47 +108,78 @@ class MergePdfViewModel @Inject constructor(
     }
 
     fun toggleFileSelection(file: DocumentItem) {
-        _state.update { current ->
-            val isAlreadySelected = current.selectedFiles.any { it.path == file.path }
-            val updated = if (isAlreadySelected) {
-                current.selectedFiles.filter { it.path != file.path }
-            } else {
-                current.selectedFiles + file
+        val isAlreadySelected = _state.value.selectedFiles.any { it.path == file.path }
+        if (isAlreadySelected) {
+            _state.update { current ->
+                current.copy(selectedFiles = current.selectedFiles.filter { it.path != file.path })
             }
-            current.copy(selectedFiles = updated)
+            return
+        }
+
+        viewModelScope.launch {
+            val validation = validatePdfUseCase(file.path)
+            if (validation.isFailure) {
+                val errorMsg = validation.exceptionOrNull()?.message
+                    ?: "Cannot select \"${file.name}\": The file is corrupted or not a valid PDF."
+                _state.update { it.copy(errorMessage = errorMsg) }
+                return@launch
+            }
+
+            _state.update { current ->
+                if (current.selectedFiles.any { it.path == file.path }) current
+                else current.copy(selectedFiles = current.selectedFiles + file)
+            }
         }
     }
 
     fun addSelectedUris(context: Context, uris: List<Uri>) {
         viewModelScope.launch {
             val added = mutableListOf<DocumentItem>()
+            var corruptCount = 0
             for (uri in uris) {
+                val rawSegment = uri.lastPathSegment ?: "file"
+                val cleanSegment = rawSegment
+                    .substringAfterLast('/')
+                    .substringAfterLast(':')
+                    .replace("[^a-zA-Z0-9._-]".toRegex(), "_")
+                    .removeSuffix(".pdf")
+                val safeTargetName = "merge_${System.currentTimeMillis()}_${cleanSegment.ifBlank { "file" }}.pdf"
                 val tempFile = FileUtils.copyUriToTempFile(
                     context,
                     uri,
-                    "merge_${System.currentTimeMillis()}_${uri.lastPathSegment ?: "file"}.pdf"
+                    safeTargetName
                 )
                 if (tempFile != null && tempFile.exists()) {
-                    val item = DocumentItem(
-                        path = tempFile.absolutePath,
-                        name = tempFile.name,
-                        size = tempFile.length(),
-                        formattedSize = FileUtils.formatFileSize(tempFile.length()),
-                        dateModified = tempFile.lastModified(),
-                        formattedDate = SimpleDateFormat("MM/dd/yyyy", Locale.US).format(Date(tempFile.lastModified())),
-                        extension = "pdf",
-                        type = DocumentType.PDF
-                    )
-                    added.add(item)
+                    val validation = validatePdfUseCase(tempFile.absolutePath)
+                    if (validation.isSuccess) {
+                        val item = DocumentItem(
+                            path = tempFile.absolutePath,
+                            name = tempFile.name,
+                            size = tempFile.length(),
+                            formattedSize = FileUtils.formatFileSize(tempFile.length()),
+                            dateModified = tempFile.lastModified(),
+                            formattedDate = SimpleDateFormat("MM/dd/yyyy", Locale.US).format(Date(tempFile.lastModified())),
+                            extension = "pdf",
+                            type = DocumentType.PDF
+                        )
+                        added.add(item)
+                    } else {
+                        corruptCount++
+                        runCatching { tempFile.delete() }
+                    }
                 }
             }
             _state.update { current ->
-                val newAvailable = current.availableFiles + added
-                val newSelected = current.selectedFiles + added
+                val newAvailable = (added + current.availableFiles).distinctBy { it.path }
+                val newSelected = (current.selectedFiles + added).distinctBy { it.path }
+                val errorMsg = if (corruptCount > 0) {
+                    "$corruptCount file(s) could not be selected because they are corrupted or invalid."
+                } else current.errorMessage
                 current.copy(
                     availableFiles = newAvailable,
                     filteredFiles = filterDocs(newAvailable, current.searchQuery),
-                    selectedFiles = newSelected
+                    selectedFiles = newSelected,
+                    errorMessage = errorMsg
                 )
             }
         }
@@ -220,11 +253,14 @@ class MergePdfViewModel @Inject constructor(
                 )
             }
 
-            // Smooth progress counting from 0% up to 88% while merge executes
+            val minDisplayTimeMs = 4500L
+            val startTime = System.currentTimeMillis()
+
+            // Smooth progress counting from 0% up to 90% over ~4.5 seconds
             progressJob?.cancel()
             progressJob = launch {
-                for (p in 1..88) {
-                    delay(35)
+                for (p in 1..90) {
+                    delay(50)
                     _state.update { it.copy(mergeProgress = p) }
                 }
             }
@@ -232,6 +268,11 @@ class MergePdfViewModel @Inject constructor(
             val paths = files.map { it.path }
             val result = mergePdfUseCase(paths, cleanedName)
 
+            // Hold dialog so user can see Native Ad for fixed duration
+            val elapsed = System.currentTimeMillis() - startTime
+            if (elapsed < minDisplayTimeMs) {
+                delay(minDisplayTimeMs - elapsed)
+            }
             progressJob?.cancel()
 
             result.onSuccess { path ->
@@ -239,9 +280,9 @@ class MergePdfViewModel @Inject constructor(
                 val currentP = _state.value.mergeProgress
                 for (p in currentP..100) {
                     _state.update { it.copy(mergeProgress = p) }
-                    delay(12)
+                    delay(15)
                 }
-                delay(350) // Brief pause to see 100%
+                delay(400) // Brief pause to see 100%
                 _state.update {
                     it.copy(
                         isMerging = false,
@@ -251,10 +292,19 @@ class MergePdfViewModel @Inject constructor(
                     )
                 }
             }.onFailure { error ->
+                val rawMsg = error.message.orEmpty()
+                val errorMsg = when {
+                    rawMsg.contains("root object specification", ignoreCase = true) ->
+                        "One or more selected files are corrupted (missing root trailer) and cannot be merged."
+                    rawMsg.contains("header signature", ignoreCase = true) ->
+                        "One or more selected files are corrupted or not valid PDF documents."
+                    rawMsg.isNotBlank() -> rawMsg
+                    else -> "Merge failed. Please try again."
+                }
                 _state.update {
                     it.copy(
                         isMerging = false,
-                        errorMessage = error.message ?: "Merge failed. Please try again."
+                        errorMessage = errorMsg
                     )
                 }
             }

@@ -64,39 +64,53 @@ fun BannerAdView(
  * with proper asset view bindings (headline, body/advertiser, icon, CTA)
  * ensuring 100% compliant AdMob impressions and clicks using GMA Next-Gen SDK.
  */
+enum class NativeAdStyle {
+    MEDIUM,
+    SMALL
+}
+
+/**
+ * Professional Native Ad Composable supporting Medium & Small styles,
+ * with proper asset view bindings (headline, body/advertiser, icon, media view, CTA)
+ * ensuring 100% compliant AdMob impressions and clicks using GMA Next-Gen SDK.
+ */
 @Composable
 fun NativeAdCard(
     modifier: Modifier = Modifier,
     adUnitId: String? = null,
-    adKey: String = AdMobManager.KEY_FILE_READER_NATIVE
+    adKey: String = AdMobManager.KEY_FILE_READER_NATIVE,
+    style: NativeAdStyle = NativeAdStyle.MEDIUM
 ) {
     if (!AdMobManager.isAdEnabled(adKey)) return
 
     val context = LocalContext.current
     val targetId = adUnitId ?: AdMobManager.getNativeId(context)
-    var nativeAd by remember { mutableStateOf<NativeAd?>(null) }
+    var nativeAd by remember { mutableStateOf<NativeAd?>(AdMobManager.consumePreloadedNativeAd()) }
 
     DisposableEffect(targetId) {
-        val request = NativeAdRequest.Builder(
-            targetId,
-            listOf(com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd.NativeAdType.NATIVE)
-        ).build()
-        NativeAdLoader.load(
-            request,
-            object : NativeAdLoaderCallback {
-                override fun onNativeAdLoaded(ad: NativeAd) {
-                    nativeAd?.destroy()
-                    nativeAd = ad
-                }
+        if (nativeAd == null) {
+            val request = NativeAdRequest.Builder(
+                targetId,
+                listOf(com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd.NativeAdType.NATIVE)
+            ).build()
+            NativeAdLoader.load(
+                request,
+                object : NativeAdLoaderCallback {
+                    override fun onNativeAdLoaded(ad: NativeAd) {
+                        nativeAd?.destroy()
+                        nativeAd = ad
+                    }
 
-                override fun onAdFailedToLoad(error: LoadAdError) {
-                    nativeAd = null
+                    override fun onAdFailedToLoad(error: LoadAdError) {
+                        nativeAd = null
+                    }
                 }
-            }
-        )
+            )
+        }
 
         onDispose {
             nativeAd?.destroy()
+            AdMobManager.preloadNativeAd(context)
         }
     }
 
@@ -114,9 +128,14 @@ fun NativeAdCard(
             AndroidView(
                 modifier = Modifier.fillMaxWidth(),
                 factory = { ctx ->
+                    val layoutId = if (style == NativeAdStyle.MEDIUM) {
+                        R.layout.layout_native_ad_view_medium
+                    } else {
+                        R.layout.lyt_native_small_banner
+                    }
                     val inflater = LayoutInflater.from(ctx)
                     val nativeAdView = inflater.inflate(
-                        R.layout.lyt_native_small_banner,
+                        layoutId,
                         null,
                         false
                     ) as NativeAdView
@@ -131,22 +150,59 @@ fun NativeAdCard(
     }
 }
 
+/**
+ * Helper shortcut to explicitly invoke Medium Native Ad.
+ */
+@Composable
+fun MediumNativeAdCard(
+    modifier: Modifier = Modifier,
+    adUnitId: String? = null,
+    adKey: String = AdMobManager.KEY_FILE_READER_NATIVE
+) {
+    NativeAdCard(
+        modifier = modifier,
+        adUnitId = adUnitId,
+        adKey = adKey,
+        style = NativeAdStyle.MEDIUM
+    )
+}
+
 private fun populateNativeView(nativeAd: NativeAd, nativeAdView: NativeAdView) {
     val headlineView = nativeAdView.findViewById<TextView>(R.id.tv_primary)
     val secondaryView = nativeAdView.findViewById<TextView>(R.id.tv_secondary)
+    val bodyView = nativeAdView.findViewById<TextView>(R.id.tv_body)
     val iconView = nativeAdView.findViewById<ImageView>(R.id.iv_icon)
     val ctaButton = nativeAdView.findViewById<Button>(R.id.btn_cta)
+    val mediaView = nativeAdView.findViewById<com.google.android.libraries.ads.mobile.sdk.nativead.MediaView>(R.id.media_view)
 
     headlineView?.text = nativeAd.headline
     nativeAdView.headlineView = headlineView
 
-    val bodyOrAdvertiser = nativeAd.body ?: nativeAd.advertiser ?: nativeAd.store ?: ""
-    if (bodyOrAdvertiser.isNotBlank()) {
-        secondaryView?.text = bodyOrAdvertiser
+    val advertiserOrStore = nativeAd.advertiser ?: nativeAd.store ?: ""
+    if (advertiserOrStore.isNotBlank()) {
+        secondaryView?.text = advertiserOrStore
         secondaryView?.visibility = View.VISIBLE
         nativeAdView.bodyView = secondaryView
     } else {
-        secondaryView?.visibility = View.GONE
+        val body = nativeAd.body ?: ""
+        if (bodyView == null && body.isNotBlank()) {
+            secondaryView?.text = body
+            secondaryView?.visibility = View.VISIBLE
+            nativeAdView.bodyView = secondaryView
+        } else {
+            secondaryView?.visibility = View.GONE
+        }
+    }
+
+    if (bodyView != null) {
+        val body = nativeAd.body ?: ""
+        if (body.isNotBlank()) {
+            bodyView.text = body
+            bodyView.visibility = View.VISIBLE
+            nativeAdView.bodyView = bodyView
+        } else {
+            bodyView.visibility = View.GONE
+        }
     }
 
     if (nativeAd.icon != null) {
@@ -157,13 +213,10 @@ private fun populateNativeView(nativeAd: NativeAd, nativeAdView: NativeAdView) {
         iconView?.visibility = View.GONE
     }
 
-    if (!nativeAd.callToAction.isNullOrBlank()) {
-        ctaButton?.text = nativeAd.callToAction
-        ctaButton?.visibility = View.VISIBLE
-        nativeAdView.callToActionView = ctaButton
-    } else {
-        ctaButton?.visibility = View.GONE
-    }
+    val ctaText = if (!nativeAd.callToAction.isNullOrBlank()) nativeAd.callToAction else "Install"
+    ctaButton?.text = ctaText
+    ctaButton?.visibility = View.VISIBLE
+    nativeAdView.callToActionView = ctaButton
 
     nativeAdView.registerNativeAd(nativeAd, null)
 }

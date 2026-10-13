@@ -36,10 +36,10 @@ sealed interface Screen {
     data class GlobalSearch(val initialType: String = "ALL") : Screen
 
     @Serializable
-    data class PdfViewer(val filePath: String, val title: String) : Screen
+    data class PdfViewer(val filePath: String = "", val title: String = "") : Screen
 
     @Serializable
-    data class OfficeViewer(val filePath: String, val title: String) : Screen
+    data class OfficeViewer(val filePath: String = "", val title: String = "") : Screen
 
     @Serializable
     data object ToolsHome : Screen

@@ -206,11 +206,14 @@ class OrganizePdfViewModel @Inject constructor(
                 )
             }
 
-            // Smooth progress counting from 0% up to 88% while export executes
+            val minDisplayTimeMs = 4500L
+            val startTime = System.currentTimeMillis()
+
+            // Smooth progress counting from 0% up to 90% over ~4.5 seconds
             progressJob?.cancel()
             progressJob = launch {
-                for (p in 1..88) {
-                    delay(35)
+                for (p in 1..90) {
+                    delay(50)
                     _state.update { it.copy(prepareProgress = p) }
                 }
             }
@@ -218,6 +221,11 @@ class OrganizePdfViewModel @Inject constructor(
             val selectedIndices = pages.map { it.originalIndex }
             val result = organizePdfUseCase(_state.value.filePath, selectedIndices, outputName)
 
+            // Hold dialog so user can see Native Ad for fixed duration
+            val elapsed = System.currentTimeMillis() - startTime
+            if (elapsed < minDisplayTimeMs) {
+                delay(minDisplayTimeMs - elapsed)
+            }
             progressJob?.cancel()
 
             result.onSuccess { path ->
@@ -225,9 +233,9 @@ class OrganizePdfViewModel @Inject constructor(
                 val currentP = _state.value.prepareProgress
                 for (p in currentP..100) {
                     _state.update { it.copy(prepareProgress = p) }
-                    delay(12)
+                    delay(15)
                 }
-                delay(350) // Brief pause to see 100%
+                delay(400) // Brief pause to see 100%
                 _state.update {
                     it.copy(
                         isPreparing = false,

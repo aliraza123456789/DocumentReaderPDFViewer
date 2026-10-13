@@ -97,12 +97,18 @@ object FileUtils {
     fun copyUriToTempFile(context: Context, uri: Uri, targetName: String): File? {
         return try {
             val tempFile = File(context.cacheDir, targetName)
+            tempFile.parentFile?.mkdirs()
             context.contentResolver.openInputStream(uri)?.use { input ->
                 FileOutputStream(tempFile).use { output ->
                     input.copyTo(output)
                 }
             }
-            tempFile
+            if (tempFile.exists() && tempFile.length() > 0L) {
+                tempFile
+            } else {
+                tempFile.delete()
+                null
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             null
