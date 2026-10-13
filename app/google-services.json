@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "40370757407",
-    "project_id": "att-pdf-reader",
-    "storage_bucket": "att-pdf-reader.appspot.com"
+    "project_number": "17590965240",
+    "project_id": "all-document-reader-89728",
+    "storage_bucket": "all-document-reader-89728.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:40370757407:android:7e984d48be49fa99041a2a",
+        "mobilesdk_app_id": "1:17590965240:android:85711f5cda13c8f8207c0d",
         "android_client_info": {
-          "package_name": "com.pdf.alldocument.viewer.pdfreaderapp"
+          "package_name": "com.pdf.alldocument.office.reader"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "40370757407-ivfmrhsm9jhtrh6v0g0td85lopvos5mh.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDv_P3EexugliaAwLARLW5KcYSoZXH-bX0"
+          "current_key": "AIzaSyDqtLSch6nQFqwbt0Le8pc5j-KZhb-HPwc"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "40370757407-ivfmrhsm9jhtrh6v0g0td85lopvos5mh.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

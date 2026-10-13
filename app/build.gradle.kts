@@ -9,15 +9,15 @@ plugins {
 }
 
 android {
-    namespace = "com.pdf.alldocument.viewer.pdfreaderapp"
+    namespace = "com.pdf.alldocument.office.pdfreaderapp"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.pdf.alldocument.viewer.pdfreaderapp"
+        applicationId = "com.pdf.alldocument.office.pdfreaderapp"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 4
+        versionName = "1.0.4"
 
 //        val props = java.util.Properties().apply {
 //            val f = rootProject.file("local.properties")
@@ -30,11 +30,15 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
         }
         debug {
             isMinifyEnabled = false
