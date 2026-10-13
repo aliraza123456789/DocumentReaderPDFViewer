@@ -17,25 +17,76 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pdf.alldocument.office.pdfreaderapp.core.ads.NativeAdCard
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.AppTopBar
 import com.pdf.alldocument.office.pdfreaderapp.core.localization.LanguageManager
 import com.pdf.alldocument.office.pdfreaderapp.core.localization.SupportedLanguage
+import kotlinx.coroutines.launch
 
 @Composable
 fun LanguageScreen(
+    isFirstLaunch: Boolean = false,
     viewModel: LanguageViewModel = hiltViewModel(),
     onBack: (() -> Unit)? = null,
     onLanguageSelected: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val selectedCode by viewModel.selectedLanguageCode.collectAsStateWithLifecycle()
+    val activity = context as? android.app.Activity
+    val savedCode by viewModel.selectedLanguageCode.collectAsStateWithLifecycle()
+    var selectedCode by remember(savedCode) { mutableStateOf(savedCode) }
+
+    // Preload Interstitial ad
+    LaunchedEffect(Unit) {
+        viewModel.interstitialAdHelper.loadAd(context)
+    }
+
+    val scope = rememberCoroutineScope()
+    var isProcessing by remember { mutableStateOf(false) }
+
+    val onConfirmSelection = {
+        if (!isProcessing) {
+            isProcessing = true
+            val proceedNext = {
+                scope.launch {
+                    viewModel.saveLanguageSuspend(selectedCode)
+                    onLanguageSelected()
+                }
+            }
+
+            if (activity != null) {
+                viewModel.interstitialAdHelper.showAd(
+                    activity = activity,
+                    adKey = com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager.KEY_LANGUAGE_INTER,
+                    frequencyEveryClicks = 1,
+                    onAdDismissed = { proceedNext() }
+                )
+            } else {
+                proceedNext()
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
             AppTopBar(
                 title = "Select Language",
-                onBackClick = onBack
+                onBackClick = onBack,
+                actions = {
+                    IconButton(
+                        onClick = onConfirmSelection,
+                        enabled = !isProcessing
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Select Language",
+                            tint = if (isProcessing) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f) else MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             )
+        },
+        bottomBar = {
+            NativeAdCard()
         }
     ) { padding ->
         LazyColumn(
@@ -49,9 +100,10 @@ fun LanguageScreen(
                     language = language,
                     isSelected = language.code == selectedCode,
                     onClick = {
-                        viewModel.selectLanguage(language.code)
-                        LanguageManager.setAppLocale(context, language.code)
-                        onLanguageSelected()
+                        if (selectedCode != language.code) {
+                            selectedCode = language.code
+                            LanguageManager.setAppLocale(context, language.code)
+                        }
                     }
                 )
             }

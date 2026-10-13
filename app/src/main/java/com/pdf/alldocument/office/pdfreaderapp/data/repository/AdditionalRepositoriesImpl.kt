@@ -71,6 +71,7 @@ class UserPrefsRepositoryImpl @Inject constructor(
     override val isOnboardingCompleted: Flow<Boolean> = preferencesManager.onboardingCompletedFlow
     override val isGridView: Flow<Boolean> = preferencesManager.isGridViewFlow
     override val isPrivacyPolicyAccepted: Flow<Boolean> = preferencesManager.privacyPolicyAcceptedFlow
+    override val isLanguageSelected: Flow<Boolean> = preferencesManager.isLanguageSelectedFlow
 
     override suspend fun setThemeMode(mode: String) {
         preferencesManager.setThemeMode(mode)
@@ -82,6 +83,10 @@ class UserPrefsRepositoryImpl @Inject constructor(
 
     override suspend fun setLanguageCode(code: String) {
         preferencesManager.setLanguage(code)
+    }
+
+    override suspend fun setIsLanguageSelected(selected: Boolean) {
+        preferencesManager.setIsLanguageSelected(selected)
     }
 
     override suspend fun setNightMode(enabled: Boolean) {

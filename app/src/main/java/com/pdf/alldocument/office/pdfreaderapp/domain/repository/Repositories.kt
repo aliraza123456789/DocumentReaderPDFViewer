@@ -43,10 +43,12 @@ interface UserPrefsRepository {
     val isOnboardingCompleted: Flow<Boolean>
     val isGridView: Flow<Boolean>
     val isPrivacyPolicyAccepted: Flow<Boolean>
+    val isLanguageSelected: Flow<Boolean>
 
     suspend fun setThemeMode(mode: String)
     suspend fun setSortOrder(order: SortOrder)
     suspend fun setLanguageCode(code: String)
+    suspend fun setIsLanguageSelected(selected: Boolean)
     suspend fun setNightMode(enabled: Boolean)
     suspend fun setKeepScreenOn(enabled: Boolean)
     suspend fun setHorizontalScroll(enabled: Boolean)

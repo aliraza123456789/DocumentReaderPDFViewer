@@ -3,6 +3,7 @@ package com.pdf.alldocument.office.pdfreaderapp.presentation.viewer.pdf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pdf.alldocument.office.pdfreaderapp.core.analytics.AnalyticsManager
 import com.pdf.alldocument.office.pdfreaderapp.data.pdf.PdfRendererEngine
 import com.pdf.alldocument.office.pdfreaderapp.domain.model.PageRenderData
 import com.pdf.alldocument.office.pdfreaderapp.domain.repository.DocumentRepository
@@ -32,6 +33,7 @@ data class PdfViewerState(
 class PdfViewerViewModel @Inject constructor(
     private val pdfRendererEngine: PdfRendererEngine,
     private val documentRepository: DocumentRepository,
+    private val analyticsManager: AnalyticsManager,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -39,6 +41,7 @@ class PdfViewerViewModel @Inject constructor(
     val state: StateFlow<PdfViewerState> = _state.asStateFlow()
 
     fun initialize(filePath: String, title: String, lastReadPage: Int = 0) {
+        analyticsManager.logDocumentOpened("pdf")
         _state.update {
             it.copy(
                 filePath = filePath,
@@ -96,8 +99,12 @@ class PdfViewerViewModel @Inject constructor(
     private fun loadPdf(renderPath: String, initialPage: Int) {
         viewModelScope.launch {
             val totalPages = pdfRendererEngine.getPageCount(renderPath)
-            if (totalPages == 0 && pdfRendererEngine.isEncrypted(_state.value.filePath)) {
-                _state.update { it.copy(isPasswordProtected = true, isLoading = false) }
+            if (totalPages == 0) {
+                if (pdfRendererEngine.isEncrypted(_state.value.filePath)) {
+                    _state.update { it.copy(isPasswordProtected = true, isLoading = false) }
+                } else {
+                    _state.update { it.copy(isLoading = false, errorMessage = "Unable to open or read document") }
+                }
                 return@launch
             }
 
@@ -129,6 +136,7 @@ class PdfViewerViewModel @Inject constructor(
                         )
                     }
                 }
+            _state.update { it.copy(isLoading = false) }
         }
     }
 

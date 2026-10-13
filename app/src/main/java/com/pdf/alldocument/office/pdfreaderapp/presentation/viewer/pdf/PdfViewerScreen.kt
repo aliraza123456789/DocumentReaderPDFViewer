@@ -29,6 +29,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.pdf.alldocument.office.pdfreaderapp.core.util.ShareUtils
+import kotlinx.coroutines.launch
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,13 +43,14 @@ fun PdfViewerScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     var showJumpDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(filePath) {
         viewModel.initialize(filePath, title, lastReadPage)
     }
 
-    val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = lastReadPage)
+    val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = lastReadPage.coerceAtLeast(0))
 
     // Pinch-to-zoom state
     var scale by remember { mutableFloatStateOf(1f) }
@@ -114,6 +116,13 @@ fun PdfViewerScreen(
         ) {
             if (state.isLoading && state.pages.isEmpty()) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else if (state.errorMessage != null && state.pages.isEmpty()) {
+                Text(
+                    text = state.errorMessage ?: "Failed to open document",
+                    modifier = Modifier.align(Alignment.Center).padding(24.dp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.error
+                )
             } else {
                 LazyColumn(
                     state = lazyListState,
@@ -189,7 +198,11 @@ fun PdfViewerScreen(
                 onDismiss = { showJumpDialog = false },
                 onConfirm = { pageNumber ->
                     showJumpDialog = false
-                    viewModel.jumpToPage(pageNumber - 1)
+                    val targetIndex = (pageNumber - 1).coerceIn(0, (state.totalPages - 1).coerceAtLeast(0))
+                    viewModel.jumpToPage(targetIndex)
+                    coroutineScope.launch {
+                        lazyListState.scrollToItem(targetIndex)
+                    }
                 }
             )
         }

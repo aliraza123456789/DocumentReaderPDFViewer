@@ -8,6 +8,7 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager
 import com.pdf.alldocument.office.pdfreaderapp.core.ads.AppOpenAdHelper
+import com.pdf.alldocument.office.pdfreaderapp.core.ads.InterstitialAdHelper
 import com.pdf.alldocument.office.pdfreaderapp.core.billing.BillingManager
 import com.pdf.alldocument.office.pdfreaderapp.core.billing.PurchaseState
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
@@ -31,6 +32,9 @@ class App : Application(), Configuration.Provider {
 
     @Inject
     lateinit var billingManager: BillingManager
+
+    @Inject
+    lateinit var interstitialAdHelper: InterstitialAdHelper
 
     companion object {
         const val CHANNEL_ID = "pdf_reader_channel"
@@ -58,6 +62,7 @@ class App : Application(), Configuration.Provider {
             billingManager.purchaseState.collect { state ->
                 val isPro = state is PurchaseState.Subscribed || state is PurchaseState.LifetimePro
                 appOpenAdHelper.isPremiumUser = isPro
+                interstitialAdHelper.isPremiumUser = isPro
             }
         }
 

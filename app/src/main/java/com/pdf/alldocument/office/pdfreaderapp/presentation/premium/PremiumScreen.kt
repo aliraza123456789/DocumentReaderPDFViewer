@@ -1,16 +1,23 @@
 package com.pdf.alldocument.office.pdfreaderapp.presentation.premium
 
 import android.app.Activity
+import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.*
@@ -29,17 +36,39 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pdf.alldocument.office.pdfreaderapp.core.billing.PurchaseState
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.AccentGold
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.AppTopBar
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PremiumScreen(
+    isFromOnboarding: Boolean = false,
     viewModel: PremiumViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit
 ) {
     val purchaseState by viewModel.purchaseState.collectAsStateWithLifecycle()
     val products by viewModel.products.collectAsStateWithLifecycle()
+    val isRestoring by viewModel.isRestoring.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val activity = context as? Activity
+
+    // 3-second countdown timer for Onboarding close button
+    var remainingSeconds by remember { mutableIntStateOf(if (isFromOnboarding) 3 else 0) }
+
+    LaunchedEffect(isFromOnboarding) {
+        if (isFromOnboarding) {
+            while (remainingSeconds > 0) {
+                delay(1000L)
+                remainingSeconds--
+            }
+        }
+    }
+
+    // Feedback toast for Restore Purchases
+    LaunchedEffect(Unit) {
+        viewModel.restoreMessage.collect { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     val isPro = purchaseState is PurchaseState.Subscribed || purchaseState is PurchaseState.LifetimePro
 
@@ -47,10 +76,64 @@ fun PremiumScreen(
         topBar = {
             AppTopBar(
                 title = "Go Premium",
-                onBackClick = onNavigateBack,
+                onBackClick = if (isFromOnboarding) null else onNavigateBack,
                 actions = {
-                    TextButton(onClick = { viewModel.restorePurchases() }) {
-                        Text("Restore")
+                    TextButton(
+                        onClick = { viewModel.restorePurchases() },
+                        enabled = !isRestoring
+                    ) {
+                        if (isRestoring) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        } else {
+                            Text("Restore", fontWeight = FontWeight.SemiBold)
+                        }
+                    }
+
+                    if (isFromOnboarding) {
+                        Spacer(modifier = Modifier.width(4.dp))
+                        AnimatedContent(
+                            targetState = remainingSeconds,
+                            transitionSpec = { fadeIn() togetherWith fadeOut() },
+                            label = "countdown_cross_transition"
+                        ) { seconds ->
+                            if (seconds > 0) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(end = 8.dp)
+                                        .size(34.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "${seconds}s",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            } else {
+                                IconButton(
+                                    onClick = onNavigateBack,
+                                    modifier = Modifier
+                                        .padding(end = 4.dp)
+                                        .size(34.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Close",
+                                        tint = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             )
@@ -157,6 +240,17 @@ fun PremiumScreen(
                         fontWeight = FontWeight.Bold
                     )
                 }
+
+                if (isFromOnboarding) {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Button(
+                        onClick = onNavigateBack,
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
+                        shape = RoundedCornerShape(14.dp)
+                    ) {
+                        Text("Continue to App", fontWeight = FontWeight.Bold)
+                    }
+                }
             } else {
                 // Subscription options cards
                 val samplePlans = listOf(
@@ -236,7 +330,11 @@ fun PremiumScreen(
                         if (product != null && activity != null) {
                             viewModel.buyProduct(activity, product)
                         } else {
-                            // Fallback simulation / toast
+                            Toast.makeText(
+                                context,
+                                "Google Play Store is connecting. Please try again shortly.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(52.dp),

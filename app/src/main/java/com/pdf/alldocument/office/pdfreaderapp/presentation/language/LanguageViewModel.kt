@@ -12,7 +12,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LanguageViewModel @Inject constructor(
-    private val userPrefsRepository: UserPrefsRepository
+    private val userPrefsRepository: UserPrefsRepository,
+    val interstitialAdHelper: com.pdf.alldocument.office.pdfreaderapp.core.ads.InterstitialAdHelper
 ) : ViewModel() {
 
     val languages: List<SupportedLanguage> = APP_SUPPORTED_LANGUAGES
@@ -20,9 +21,17 @@ class LanguageViewModel @Inject constructor(
     val selectedLanguageCode: StateFlow<String> = userPrefsRepository.languageCode
         .stateIn(viewModelScope, SharingStarted.Eagerly, "en")
 
+    val isLanguageSelected: StateFlow<Boolean> = userPrefsRepository.isLanguageSelected
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     fun selectLanguage(code: String) {
         viewModelScope.launch {
-            userPrefsRepository.setLanguageCode(code)
+            saveLanguageSuspend(code)
         }
+    }
+
+    suspend fun saveLanguageSuspend(code: String) {
+        userPrefsRepository.setLanguageCode(code)
+        userPrefsRepository.setIsLanguageSelected(true)
     }
 }

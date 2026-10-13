@@ -15,7 +15,7 @@ sealed interface Screen {
     data class PrivacyPolicy(val isFirstLaunch: Boolean = false) : Screen
 
     @Serializable
-    data object LanguageSelection : Screen
+    data class LanguageSelection(val isFirstLaunch: Boolean = false) : Screen
 
     @Serializable
     data object Home : Screen
@@ -108,5 +108,5 @@ sealed interface Screen {
     data object PdfToWord : Screen
 
     @Serializable
-    data object Premium : Screen
+    data class Premium(val isFromOnboarding: Boolean = false) : Screen
 }

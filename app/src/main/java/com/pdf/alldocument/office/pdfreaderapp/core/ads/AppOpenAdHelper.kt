@@ -3,20 +3,30 @@ package com.pdf.alldocument.office.pdfreaderapp.core.ads
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.appopen.AppOpenAd
+import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAd
+import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAdEventCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.pdf.alldocument.office.pdfreaderapp.core.analytics.AnalyticsManager
 import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AppOpenAdHelper @Inject constructor() : Application.ActivityLifecycleCallbacks, DefaultLifecycleObserver {
+class AppOpenAdHelper @Inject constructor(
+    private val analyticsManager: AnalyticsManager
+) : Application.ActivityLifecycleCallbacks, DefaultLifecycleObserver {
+
+    companion object {
+        private const val TAG = "AppOpenAdHelper"
+        var isAlreadyShowingAd = false
+    }
 
     private var appOpenAd: AppOpenAd? = null
     private var isAdLoading = false
@@ -32,32 +42,45 @@ class AppOpenAdHelper @Inject constructor() : Application.ActivityLifecycleCallb
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
+        // Respect Remote Config switch, Premium status, and Interstitial state
+        if (isPremiumUser || !AdMobManager.isAdEnabled(AdMobManager.KEY_APP_OPEN)) {
+            Log.d(TAG, "App open ad disabled by config or premium status.")
+            return
+        }
+
+        // Never show App Open Ad while an Interstitial Ad is showing or requested
+        if (AdMobManager.isInterstitialShowing || isAlreadyShowingAd) {
+            Log.d(TAG, "Skipping App Open ad because Interstitial/another ad is currently visible.")
+            return
+        }
+
         currentActivity?.let {
-            if (!isPremiumUser) {
-                showAdIfAvailable(it)
-            }
+            showAdIfAvailable(it)
         }
     }
 
     fun loadAd(activity: Activity) {
-        if (isAdAvailable() || isAdLoading || isPremiumUser) return
+        if (isAdAvailable() || isAdLoading || isPremiumUser || !AdMobManager.isAdEnabled(AdMobManager.KEY_APP_OPEN)) {
+            return
+        }
 
         isAdLoading = true
-        val request = AdRequest.Builder().build()
+        val targetId = AdMobManager.getAppOpenId(activity)
+        val request = AdRequest.Builder(targetId).build()
         AppOpenAd.load(
-            activity,
-            AdMobManager.TEST_APP_OPEN_ID,
             request,
-            object : AppOpenAd.AppOpenAdLoadCallback() {
+            object : AdLoadCallback<AppOpenAd> {
                 override fun onAdLoaded(ad: AppOpenAd) {
                     appOpenAd = ad
                     isAdLoading = false
                     loadTime = Date().time
+                    Log.d(TAG, "GMA Next-Gen AppOpenAd loaded successfully.")
                 }
 
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                     appOpenAd = null
                     isAdLoading = false
+                    Log.e(TAG, "GMA Next-Gen AppOpenAd failed to load: ${loadAdError.message}")
                 }
             }
         )
@@ -75,7 +98,7 @@ class AppOpenAdHelper @Inject constructor() : Application.ActivityLifecycleCallb
     }
 
     fun showAdIfAvailable(activity: Activity, onDismiss: () -> Unit = {}) {
-        if (isShowingAd || isPremiumUser) {
+        if (isShowingAd || isAlreadyShowingAd || isPremiumUser || AdMobManager.isInterstitialShowing) {
             onDismiss()
             return
         }
@@ -86,36 +109,46 @@ class AppOpenAdHelper @Inject constructor() : Application.ActivityLifecycleCallb
             return
         }
 
-        appOpenAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-            override fun onAdDismissedFullScreenContent() {
-                appOpenAd = null
-                isShowingAd = false
-                loadAd(activity)
-                onDismiss()
-            }
+        val ad = appOpenAd
+        if (ad != null) {
+            ad.adEventCallback = object : AppOpenAdEventCallback {
+                override fun onAdDismissedFullScreenContent() {
+                    appOpenAd = null
+                    isShowingAd = false
+                    isAlreadyShowingAd = false
+                    loadAd(activity)
+                    onDismiss()
+                }
 
-            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                appOpenAd = null
-                isShowingAd = false
-                loadAd(activity)
-                onDismiss()
-            }
+                override fun onAdFailedToShowFullScreenContent(error: FullScreenContentError) {
+                    appOpenAd = null
+                    isShowingAd = false
+                    isAlreadyShowingAd = false
+                    loadAd(activity)
+                    onDismiss()
+                }
 
-            override fun onAdShowedFullScreenContent() {
-                isShowingAd = true
+                override fun onAdShowedFullScreenContent() {
+                    isShowingAd = true
+                    isAlreadyShowingAd = true
+                    analyticsManager.logAdDisplay("app_open", AdMobManager.getAppOpenId(activity))
+                }
             }
+            ad.show(activity)
+        } else {
+            loadAd(activity)
+            onDismiss()
         }
-        appOpenAd?.show(activity)
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
     override fun onActivityStarted(activity: Activity) {
-        if (!isShowingAd) {
+        if (!isShowingAd && !AdMobManager.isInterstitialShowing) {
             currentActivity = activity
         }
     }
     override fun onActivityResumed(activity: Activity) {
-        if (!isShowingAd) {
+        if (!isShowingAd && !AdMobManager.isInterstitialShowing) {
             currentActivity = activity
         }
     }

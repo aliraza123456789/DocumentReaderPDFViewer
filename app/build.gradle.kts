@@ -39,9 +39,21 @@ android {
             ndk {
                 debugSymbolLevel = "FULL"
             }
+            resValue("string", "app_Id", "\"ca-app-pub-5049280561472321~8542624097\"")
+            resValue("string", "banner_Id", "\"ca-app-pub-5049280561472321/2001266472\"")
+            resValue("string", "native_id", "\"ca-app-pub-5049280561472321/7062021465\"")
+            resValue("string", "interstitial_Id", "\"ca-app-pub-5049280561472321/9688184809\"")
+            resValue("string", "appopen_Id", "\"ca-app-pub-5049280561472321/5622815274\"")
+            resValue("string", "rewarded_interstitial_id", "\"ca-app-pub-5049280561472321/4969379702\"")
         }
         debug {
             isMinifyEnabled = false
+            resValue("string", "app_Id", "\"ca-app-pub-3940256099942544~3347511713\"")
+            resValue("string", "banner_Id", "\"ca-app-pub-3940256099942544/2014213617\"")
+            resValue("string", "native_id", "\"ca-app-pub-3940256099942544/2247696110\"")
+            resValue("string", "interstitial_Id", "\"ca-app-pub-3940256099942544/1033173712\"")
+            resValue("string", "appopen_Id", "\"ca-app-pub-3940256099942544/9257395921\"")
+            resValue("string", "rewarded_interstitial_id", "\"ca-app-pub-3940256099942544/5354046379\"")
         }
     }
     compileOptions {
@@ -51,6 +63,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        resValues = true
     }
 }
 
@@ -128,8 +141,8 @@ dependencies {
     // Gemini Generative AI SDK
     implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
 
-    // Monetization & Play Services
-    implementation(libs.play.services.ads)
+    // Monetization & Play Services (GMA Next-Gen SDK)
+    implementation(libs.ads.mobile.sdk)
     implementation(libs.play.billing.ktx)
     implementation(libs.play.app.update.ktx)
 

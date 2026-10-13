@@ -2,9 +2,11 @@ package com.pdf.alldocument.office.pdfreaderapp.presentation.navigation
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
@@ -87,18 +89,24 @@ fun AppNavigation(navController: NavHostController) {
         bottomBar = {
             val selectedDestination = selectedBottomDestination
             if (selectedDestination != null) {
-                AppBottomNavigation(
-                    selectedDestination = selectedDestination,
-                    onDestinationSelected = { destination ->
-                        if (destination != selectedDestination) {
-                            navController.navigate(destination.route) {
-                                popUpTo(Screen.Home) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    // Small Banner Ad placed above the bottom navigation bar
+                    com.pdf.alldocument.office.pdfreaderapp.core.ads.BannerAdView(
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    AppBottomNavigation(
+                        selectedDestination = selectedDestination,
+                        onDestinationSelected = { destination ->
+                            if (destination != selectedDestination) {
+                                navController.navigate(destination.route) {
+                                    popUpTo(Screen.Home) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     ) { innerPadding ->
@@ -124,6 +132,11 @@ fun AppNavigation(navController: NavHostController) {
         ) {
             composable<Screen.Splash> {
                 SplashScreen(
+                    onNavigateToLanguage = {
+                        navController.navigate(Screen.LanguageSelection(isFirstLaunch = true)) {
+                            popUpTo(Screen.Splash) { inclusive = true }
+                        }
+                    },
                     onNavigateToPrivacyPolicy = {
                         navController.navigate(Screen.PrivacyPolicy(isFirstLaunch = true)) {
                             popUpTo(Screen.Splash) { inclusive = true }
@@ -142,33 +155,47 @@ fun AppNavigation(navController: NavHostController) {
                 )
             }
 
-            composable<Screen.PrivacyPolicy> { backStackEntry ->
-                val route = backStackEntry.toRoute<Screen.PrivacyPolicy>()
-                PrivacyPolicyScreen(
+            composable<Screen.LanguageSelection> { backStackEntry ->
+                val route = backStackEntry.toRoute<Screen.LanguageSelection>()
+                LanguageScreen(
                     isFirstLaunch = route.isFirstLaunch,
-                    onAgreeAndContinue = {
-                        navController.navigate(Screen.Onboarding) {
-                            popUpTo(Screen.PrivacyPolicy(isFirstLaunch = true)) { inclusive = true }
+                    onBack = if (route.isFirstLaunch) null else ({ navController.popBackStack() }),
+                    onLanguageSelected = {
+                        if (route.isFirstLaunch) {
+                            navController.navigate(Screen.Onboarding) {
+                                popUpTo(Screen.LanguageSelection(isFirstLaunch = true)) { inclusive = true }
+                            }
+                        } else {
+                            navController.popBackStack()
                         }
-                    },
-                    onBack = { navController.popBackStack() }
+                    }
                 )
             }
 
             composable<Screen.Onboarding> {
                 IntroSlidesScreen(
                     onFinish = {
-                        navController.navigate(Screen.Home) {
+                        navController.navigate(Screen.PrivacyPolicy(isFirstLaunch = true)) {
                             popUpTo(Screen.Onboarding) { inclusive = true }
                         }
                     }
                 )
             }
 
-            composable<Screen.LanguageSelection> {
-                LanguageScreen(
-                    onBack = { navController.popBackStack() },
-                    onLanguageSelected = { navController.popBackStack() }
+            composable<Screen.PrivacyPolicy> { backStackEntry ->
+                val route = backStackEntry.toRoute<Screen.PrivacyPolicy>()
+                PrivacyPolicyScreen(
+                    isFirstLaunch = route.isFirstLaunch,
+                    onAgreeAndContinue = {
+                        if (route.isFirstLaunch) {
+                            navController.navigate(Screen.Premium(isFromOnboarding = true)) {
+                                popUpTo(Screen.PrivacyPolicy(isFirstLaunch = true)) { inclusive = true }
+                            }
+                        } else {
+                            navController.popBackStack()
+                        }
+                    },
+                    onBack = { navController.popBackStack() }
                 )
             }
 
@@ -180,8 +207,8 @@ fun AppNavigation(navController: NavHostController) {
                     onNavigateToOfficeViewer = openOfficeDoc,
                     onNavigateToSearch = { navController.navigate(Screen.GlobalSearch()) },
                     onNavigateToTools = { navController.navigate(Screen.PdfToolsHome) },
-                    onNavigateToPremium = { navController.navigate(Screen.Premium) },
-                    onNavigateToLanguage = { navController.navigate(Screen.LanguageSelection) }
+                    onNavigateToPremium = { navController.navigate(Screen.Premium()) },
+                    onNavigateToLanguage = { navController.navigate(Screen.LanguageSelection(isFirstLaunch = false)) }
                 )
             }
 
@@ -193,7 +220,7 @@ fun AppNavigation(navController: NavHostController) {
                     onNavigateToOfficeViewer = openOfficeDoc,
                     onNavigateToSearch = { navController.navigate(Screen.GlobalSearch()) },
                     onNavigateToTools = { navController.navigate(Screen.ToolsHome) },
-                    onNavigateToPremium = { navController.navigate(Screen.Premium) },
+                    onNavigateToPremium = { navController.navigate(Screen.Premium()) },
                     onOpenMore = { navController.navigate(Screen.More) },
                     onOpenFavourites = { navController.navigate(Screen.Favorites) }
                 )
@@ -222,8 +249,8 @@ fun AppNavigation(navController: NavHostController) {
                     onNavigateToFileManager = { navController.navigate(Screen.FileManager) },
                     onNavigateToSearch = { navController.navigate(Screen.GlobalSearch()) },
                     onNavigateToTools = { navController.navigate(Screen.PdfToolsHome) },
-                    onNavigateToPremium = { navController.navigate(Screen.Premium) },
-                    onNavigateToLanguage = { navController.navigate(Screen.LanguageSelection) },
+                    onNavigateToPremium = { navController.navigate(Screen.Premium()) },
+                    onNavigateToLanguage = { navController.navigate(Screen.LanguageSelection(isFirstLaunch = false)) },
                     onNavigateToPrivacyPolicy = { navController.navigate(Screen.PrivacyPolicy(isFirstLaunch = false)) }
                 )
             }
@@ -415,9 +442,19 @@ fun AppNavigation(navController: NavHostController) {
                 )
             }
 
-            composable<Screen.Premium> {
+            composable<Screen.Premium> { backStackEntry ->
+                val route = backStackEntry.toRoute<Screen.Premium>()
                 PremiumScreen(
-                    onNavigateBack = { navController.popBackStack() }
+                    isFromOnboarding = route.isFromOnboarding,
+                    onNavigateBack = {
+                        if (route.isFromOnboarding) {
+                            navController.navigate(Screen.Home) {
+                                popUpTo(Screen.Premium(isFromOnboarding = true)) { inclusive = true }
+                            }
+                        } else {
+                            navController.popBackStack()
+                        }
+                    }
                 )
             }
         }

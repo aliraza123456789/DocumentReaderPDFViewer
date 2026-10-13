@@ -31,18 +31,42 @@ import kotlinx.coroutines.launch
 @Composable
 fun SplashScreen(
     viewModel: SplashViewModel = hiltViewModel(),
+    onNavigateToLanguage: () -> Unit,
     onNavigateToPrivacyPolicy: () -> Unit,
     onNavigateToOnboarding: () -> Unit,
     onNavigateToHome: () -> Unit
 ) {
     val target by viewModel.navigationTarget.collectAsStateWithLifecycle()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val activity = context as? android.app.Activity
+
+    // Preload Interstitial ad early during splash animation
+    LaunchedEffect(Unit) {
+        viewModel.interstitialAdHelper.loadAd(context)
+    }
 
     LaunchedEffect(target) {
-        when (target) {
-            is SplashNavigationTarget.PrivacyPolicy -> onNavigateToPrivacyPolicy()
-            is SplashNavigationTarget.Onboarding -> onNavigateToOnboarding()
-            is SplashNavigationTarget.Home -> onNavigateToHome()
-            else -> Unit
+        val onNavigate: () -> Unit = {
+            when (target) {
+                is SplashNavigationTarget.Language -> onNavigateToLanguage()
+                is SplashNavigationTarget.PrivacyPolicy -> onNavigateToPrivacyPolicy()
+                is SplashNavigationTarget.Onboarding -> onNavigateToOnboarding()
+                is SplashNavigationTarget.Home -> onNavigateToHome()
+                else -> Unit
+            }
+        }
+
+        if (target !is SplashNavigationTarget.Loading) {
+            if (activity != null) {
+                viewModel.interstitialAdHelper.showAd(
+                    activity = activity,
+                    adKey = com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager.KEY_SPLASH_INTER,
+                    frequencyEveryClicks = 1,
+                    onAdDismissed = onNavigate
+                )
+            } else {
+                onNavigate()
+            }
         }
     }
 

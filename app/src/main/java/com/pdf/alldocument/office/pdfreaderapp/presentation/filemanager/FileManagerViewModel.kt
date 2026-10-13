@@ -27,7 +27,8 @@ class FileManagerViewModel @Inject constructor(
     private val getDocumentsUseCase: GetDocumentsUseCase,
     private val searchDocumentsUseCase: SearchDocumentsUseCase,
     private val documentRepository: DocumentRepository,
-    private val userPrefsRepository: UserPrefsRepository
+    private val userPrefsRepository: UserPrefsRepository,
+    val interstitialAdHelper: com.pdf.alldocument.office.pdfreaderapp.core.ads.InterstitialAdHelper
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileManagerState())

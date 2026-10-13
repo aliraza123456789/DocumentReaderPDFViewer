@@ -61,14 +61,43 @@ fun FileManagerRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val activity = context as? android.app.Activity
+
+    // Preload Interstitial ad
+    LaunchedEffect(Unit) {
+        viewModel.interstitialAdHelper.loadAd(context)
+    }
 
     LaunchedEffect(viewModel) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                is FileManagerEffect.NavigateToPdfViewer -> onNavigateToPdfViewer(effect.document)
-                is FileManagerEffect.NavigateToOfficeViewer ->
-                    onNavigateToOfficeViewer(effect.document)
-
+                is FileManagerEffect.NavigateToPdfViewer -> {
+                    val adKey = com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager.KEY_PDF_INTERNAL_INTER
+                    if (activity != null) {
+                        viewModel.interstitialAdHelper.showAd(
+                            activity = activity,
+                            adKey = adKey,
+                            frequencyEveryClicks = 2,
+                            onAdDismissed = { onNavigateToPdfViewer(effect.document) }
+                        )
+                    } else {
+                        onNavigateToPdfViewer(effect.document)
+                    }
+                }
+                is FileManagerEffect.NavigateToOfficeViewer -> {
+                    val adKey = com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager.KEY_ALL_INTERNAL_INTER
+                    if (activity != null) {
+                        viewModel.interstitialAdHelper.showAd(
+                            activity = activity,
+                            adKey = adKey,
+                            frequencyEveryClicks = 2,
+                            onAdDismissed = { onNavigateToOfficeViewer(effect.document) }
+                        )
+                    } else {
+                        onNavigateToOfficeViewer(effect.document)
+                    }
+                }
                 is FileManagerEffect.ShowMessage -> snackbarHostState.showSnackbar(effect.message)
                 is FileManagerEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
             }

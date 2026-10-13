@@ -27,10 +27,10 @@
         android:requestLegacyExternalStorage="true"
         android:theme="@style/Theme.DocumentReaderPDFViewer">
 
-        <!-- Google AdMob Application ID (Test ID) -->
+        <!-- Google AdMob Application ID dynamically linked from Gradle resValue -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="@string/app_Id" />
 
         <!-- FileProvider for secure URI sharing and print adapters -->
         <provider

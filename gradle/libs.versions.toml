@@ -1,29 +1,29 @@
 [versions]
 agp = "9.1.1"
-kotlin = "2.2.10"
+kotlin = "2.4.21"
 ksp = "2.2.10-2.0.2"
-coreKtx = "1.19.0"
+coreKtx = "1.19.1"
 lifecycle = "2.11.0"
 activityCompose = "1.13.0"
-composeBom = "2026.02.01"
-navigationCompose = "2.8.8"
+composeBom = "2026.09.00"
+navigationCompose = "2.10.2"
 hilt = "2.60.1"
-hiltNavigationCompose = "1.2.0"
-androidxHilt = "1.3.0"
-workManager = "2.10.0"
+hiltNavigationCompose = "1.4.0"
+androidxHilt = "1.4.0"
+workManager = "2.12.0"
 pdfbox = "2.0.27.0"
-room = "2.7.2"
-coroutines = "1.10.1"
-datastore = "1.1.2"
-coil = "3.1.0"
-lottieCompose = "6.6.2"
-playServicesAds = "23.6.0"
-playBilling = "8.0.0"
+room = "2.8.5"
+coroutines = "1.11.0"
+datastore = "1.2.1"
+coil = "3.6.3"
+lottieCompose = "6.7.1"
+playBilling = "9.1.0"
+adsMobileSdk = "1.5.0"
 playAppUpdate = "2.1.0"
-firebaseBom = "33.9.0"
-itext = "5.5.13.4"
-kotlinSerialization = "1.7.3"
-reorderable = "2.4.3"
+firebaseBom = "35.0.0"
+itext = "5.5.13.6"
+kotlinSerialization = "1.11.0"
+reorderable = "3.1.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
@@ -75,7 +75,7 @@ pdfbox-android = { group = "com.tom-roush", name = "pdfbox-android", version.ref
 reorderable = { group = "sh.calvin.reorderable", name = "reorderable", version.ref = "reorderable" }
 
 # Monetization, Updates & Firebase
-play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "playServicesAds" }
+ads-mobile-sdk = { group = "com.google.android.libraries.ads.mobile.sdk", name = "ads-mobile-sdk", version.ref = "adsMobileSdk" }
 play-billing-ktx = { group = "com.android.billingclient", name = "billing-ktx", version.ref = "playBilling" }
 play-app-update-ktx = { group = "com.google.android.play", name = "app-update-ktx", version.ref = "playAppUpdate" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }

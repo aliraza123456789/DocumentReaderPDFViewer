@@ -21,7 +21,8 @@ sealed interface SplashNavigationTarget {
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val userPrefsRepository: UserPrefsRepository
+    private val userPrefsRepository: UserPrefsRepository,
+    val interstitialAdHelper: com.pdf.alldocument.office.pdfreaderapp.core.ads.InterstitialAdHelper
 ) : ViewModel() {
 
     private val _navigationTarget = MutableStateFlow<SplashNavigationTarget>(SplashNavigationTarget.Loading)
@@ -34,12 +35,16 @@ class SplashViewModel @Inject constructor(
     private fun determineDestination() {
         viewModelScope.launch {
             kotlinx.coroutines.delay(2200) // Wait for splash animations to complete (progress: 150ms + 1900ms = 2050ms)
+            val isLanguageSelected = userPrefsRepository.isLanguageSelected.first()
             val isPrivacyAccepted = userPrefsRepository.isPrivacyPolicyAccepted.first()
             val isOnboardingCompleted = userPrefsRepository.isOnboardingCompleted.first()
-            if (!isPrivacyAccepted) {
-                _navigationTarget.value = SplashNavigationTarget.PrivacyPolicy
+
+            if (!isLanguageSelected) {
+                _navigationTarget.value = SplashNavigationTarget.Language
             } else if (!isOnboardingCompleted) {
                 _navigationTarget.value = SplashNavigationTarget.Onboarding
+            } else if (!isPrivacyAccepted) {
+                _navigationTarget.value = SplashNavigationTarget.PrivacyPolicy
             } else {
                 _navigationTarget.value = SplashNavigationTarget.Home
             }

@@ -59,34 +59,46 @@ class DiskCacheManager @Inject constructor(
 
         try {
             val page = renderer.openPage(pageIndex)
-            val baseWidth = page.width
-            val baseHeight = page.height
+            try {
+                val baseWidth = page.width
+                val baseHeight = page.height
 
-            val scale = ((targetWidth.toFloat() / baseWidth.toFloat()).coerceIn(1.0f, 1.8f)) * renderScale
-            val finalWidth = (baseWidth * scale).toInt().coerceAtLeast(100)
-            val finalHeight = (baseHeight * scale).toInt().coerceAtLeast(100)
+                val scale = ((targetWidth.toFloat() / baseWidth.toFloat()).coerceIn(1.0f, 1.8f)) * renderScale
+                val finalWidth = (baseWidth * scale).toInt().coerceAtLeast(100)
+                val finalHeight = (baseHeight * scale).toInt().coerceAtLeast(100)
 
-            val bitmap = Bitmap.createBitmap(finalWidth, finalHeight, Bitmap.Config.RGB_565)
-            val canvas = Canvas(bitmap)
-            canvas.drawColor(Color.WHITE)
-            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-            page.close()
+                // Android's PdfRenderer strictly requires Bitmap.Config.ARGB_8888 (throws IllegalArgumentException with RGB_565)
+                val bitmap = Bitmap.createBitmap(finalWidth, finalHeight, Bitmap.Config.ARGB_8888)
+                val canvas = Canvas(bitmap)
+                canvas.drawColor(Color.WHITE)
+                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
 
-            val tempFile = File(cachedFile.parentFile, "${cachedFile.name}.tmp")
-            java.io.BufferedOutputStream(FileOutputStream(tempFile), 32 * 1024).use { out ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out)
-                out.flush()
+                val tempFile = File(cachedFile.parentFile, "${cachedFile.name}.tmp")
+                java.io.BufferedOutputStream(FileOutputStream(tempFile), 32 * 1024).use { out ->
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
+                    out.flush()
+                }
+                bitmap.recycle()
+
+                if (cachedFile.exists()) {
+                    cachedFile.delete()
+                }
+                if (!tempFile.renameTo(cachedFile)) {
+                    tempFile.copyTo(cachedFile, overwrite = true)
+                    tempFile.delete()
+                }
+
+                com.pdf.alldocument.office.pdfreaderapp.domain.model.PageRenderData(
+                    pageIndex = pageIndex,
+                    cachedFilePath = cachedFile.absolutePath,
+                    width = finalWidth,
+                    height = finalHeight
+                )
+            } finally {
+                page.close()
             }
-            bitmap.recycle()
-            tempFile.renameTo(cachedFile)
-            com.pdf.alldocument.office.pdfreaderapp.domain.model.PageRenderData(
-                pageIndex = pageIndex,
-                cachedFilePath = cachedFile.absolutePath,
-                width = finalWidth,
-                height = finalHeight
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (t: Throwable) {
+            android.util.Log.e("DiskCacheManager", "Error rendering page $pageIndex", t)
             null
         }
     }

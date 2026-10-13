@@ -75,13 +75,45 @@ fun HomeScreen(
         derivedStateOf { listState.firstVisibleItemIndex > 2 }
     }
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val activity = context as? android.app.Activity
+
+    // Preload Interstitial ad
+    LaunchedEffect(Unit) {
+        viewModel.interstitialAdHelper.loadAd(context)
+    }
+
     // Collect side effects
     LaunchedEffect(Unit) {
         viewModel.onEvent(HomeEvent.RefreshRequested)
         viewModel.effects.collectLatest { effect ->
             when (effect) {
-                is HomeEffect.NavigateToPdfViewer -> onNavigateToPdfViewer(effect.document)
-                is HomeEffect.NavigateToOfficeViewer -> onNavigateToOfficeViewer(effect.document)
+                is HomeEffect.NavigateToPdfViewer -> {
+                    val adKey = com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager.KEY_PDF_INTERNAL_INTER
+                    if (activity != null) {
+                        viewModel.interstitialAdHelper.showAd(
+                            activity = activity,
+                            adKey = adKey,
+                            frequencyEveryClicks = 2,
+                            onAdDismissed = { onNavigateToPdfViewer(effect.document) }
+                        )
+                    } else {
+                        onNavigateToPdfViewer(effect.document)
+                    }
+                }
+                is HomeEffect.NavigateToOfficeViewer -> {
+                    val adKey = com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager.KEY_ALL_INTERNAL_INTER
+                    if (activity != null) {
+                        viewModel.interstitialAdHelper.showAd(
+                            activity = activity,
+                            adKey = adKey,
+                            frequencyEveryClicks = 2,
+                            onAdDismissed = { onNavigateToOfficeViewer(effect.document) }
+                        )
+                    } else {
+                        onNavigateToOfficeViewer(effect.document)
+                    }
+                }
                 is HomeEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
                 is HomeEffect.ShowSnackbar -> snackbarHostState.showSnackbar(effect.message)
             }

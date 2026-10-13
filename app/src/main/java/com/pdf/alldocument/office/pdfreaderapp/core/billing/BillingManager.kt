@@ -3,6 +3,7 @@ package com.pdf.alldocument.office.pdfreaderapp.core.billing
 import android.app.Activity
 import android.content.Context
 import com.android.billingclient.api.*
+import com.pdf.alldocument.office.pdfreaderapp.core.analytics.AnalyticsManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +16,8 @@ import javax.inject.Singleton
 
 @Singleton
 class BillingManager @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val analyticsManager: AnalyticsManager
 ) : PurchasesUpdatedListener {
 
     private val _purchaseState = MutableStateFlow<PurchaseState>(PurchaseState.Free)
@@ -89,7 +91,32 @@ class BillingManager @Inject constructor(
 
     fun queryPurchases() {
         if (!billingClient.isReady) return
+        executeRestoreQuery(null)
+    }
 
+    fun restorePurchases(onResult: (isSuccess: Boolean, message: String) -> Unit) {
+        if (!billingClient.isReady) {
+            billingClient.startConnection(object : BillingClientStateListener {
+                override fun onBillingSetupFinished(billingResult: BillingResult) {
+                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                        queryProducts()
+                        executeRestoreQuery(onResult)
+                    } else {
+                        onResult(false, "Failed to connect to Google Play store.")
+                    }
+                }
+
+                override fun onBillingServiceDisconnected() {
+                    onResult(false, "Google Play service disconnected. Please try again.")
+                }
+            })
+            return
+        }
+
+        executeRestoreQuery(onResult)
+    }
+
+    private fun executeRestoreQuery(onResult: ((isSuccess: Boolean, message: String) -> Unit)?) {
         billingClient.queryPurchasesAsync(
             QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build()
         ) { billingResult, purchases ->
@@ -97,6 +124,8 @@ class BillingManager @Inject constructor(
                 val hasActiveSub = purchases.any { it.purchaseState == Purchase.PurchaseState.PURCHASED }
                 if (hasActiveSub) {
                     _purchaseState.value = PurchaseState.Subscribed
+                    analyticsManager.setUserPremiumStatus(true)
+                    onResult?.invoke(true, "Subscription restored successfully! All features unlocked.")
                     return@queryPurchasesAsync
                 }
             }
@@ -110,15 +139,28 @@ class BillingManager @Inject constructor(
                     }
                     if (hasLifetime) {
                         _purchaseState.value = PurchaseState.LifetimePro
+                        analyticsManager.setUserPremiumStatus(true)
+                        onResult?.invoke(true, "Lifetime Pro purchase restored successfully!")
                         return@queryPurchasesAsync
                     }
                 }
                 _purchaseState.value = PurchaseState.Free
+                analyticsManager.setUserPremiumStatus(false)
+                onResult?.invoke(false, "No active subscriptions or purchases found to restore.")
             }
         }
     }
 
     fun launchPurchaseFlow(activity: Activity, productDetails: ProductDetails) {
+        val pricingPhase = productDetails.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()
+        val priceMicros = pricingPhase?.priceAmountMicros ?: productDetails.oneTimePurchaseOfferDetails?.priceAmountMicros ?: 0L
+        val currencyCode = pricingPhase?.priceCurrencyCode ?: productDetails.oneTimePurchaseOfferDetails?.priceCurrencyCode ?: "USD"
+        analyticsManager.logBeginCheckout(
+            productId = productDetails.productId,
+            priceMicros = priceMicros,
+            currencyCode = currencyCode
+        )
+
         val productDetailsParamsList = if (productDetails.productType == BillingClient.ProductType.SUBS) {
             val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken ?: return
             listOf(
@@ -152,6 +194,9 @@ class BillingManager @Inject constructor(
 
     private fun handlePurchase(purchase: Purchase) {
         if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+            val productId = purchase.products.firstOrNull() ?: "unknown"
+            analyticsManager.logSubscriptionSuccess(productId = productId, orderId = purchase.orderId)
+
             if (!purchase.isAcknowledged) {
                 val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
                     .setPurchaseToken(purchase.purchaseToken)

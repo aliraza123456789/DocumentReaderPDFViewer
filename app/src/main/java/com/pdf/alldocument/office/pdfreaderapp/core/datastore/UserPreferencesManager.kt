@@ -28,6 +28,7 @@ class UserPreferencesManager @Inject constructor(
         val KEY_ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
         val KEY_IS_GRID_VIEW = booleanPreferencesKey("is_grid_view")
         val KEY_PRIVACY_POLICY_ACCEPTED = booleanPreferencesKey("privacy_policy_accepted")
+        val KEY_IS_LANGUAGE_SELECTED = booleanPreferencesKey("is_language_selected")
     }
 
     val themeModeFlow: Flow<String> = dataStore.data.map { preferences ->
@@ -66,6 +67,10 @@ class UserPreferencesManager @Inject constructor(
         preferences[KEY_PRIVACY_POLICY_ACCEPTED] ?: false
     }
 
+    val isLanguageSelectedFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[KEY_IS_LANGUAGE_SELECTED] ?: false
+    }
+
     suspend fun setThemeMode(mode: String) {
         dataStore.edit { preferences ->
             preferences[KEY_THEME] = mode
@@ -81,6 +86,13 @@ class UserPreferencesManager @Inject constructor(
     suspend fun setLanguage(code: String) {
         dataStore.edit { preferences ->
             preferences[KEY_LANGUAGE] = code
+            preferences[KEY_IS_LANGUAGE_SELECTED] = true
+        }
+    }
+
+    suspend fun setIsLanguageSelected(selected: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[KEY_IS_LANGUAGE_SELECTED] = selected
         }
     }
 
