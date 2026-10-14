@@ -18,8 +18,8 @@ android {
         applicationId = "com.pdf.alldocument.office.pdfreaderapp"
         minSdk = 24
         targetSdk = 36
-        versionCode = 4
-        versionName = "1.0.4"
+        versionCode = 5
+        versionName = "1.0.5"
 
         val props = Properties().apply {
             val f = rootProject.file("local.properties")
@@ -27,7 +27,6 @@ android {
                 f.inputStream().use { load(it) }
             }
         }
-        buildConfigField("String", "GEMINI_API_KEY", "\"${props.getProperty("GEMINI_API_KEY", "")}\"")
         buildConfigField("String", "GROQ_API_KEY", "\"${props.getProperty("GROQ_API_KEY", "")}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -44,12 +43,12 @@ android {
             ndk {
                 debugSymbolLevel = "FULL"
             }
-            resValue("string", "app_Id", "\"ca-app-pub-5049280561472321~8542624097\"")
-            resValue("string", "banner_Id", "\"ca-app-pub-5049280561472321/2001266472\"")
-            resValue("string", "native_id", "\"ca-app-pub-5049280561472321/7062021465\"")
-            resValue("string", "interstitial_Id", "\"ca-app-pub-5049280561472321/9688184809\"")
-            resValue("string", "appopen_Id", "\"ca-app-pub-5049280561472321/5622815274\"")
-            resValue("string", "rewarded_interstitial_id", "\"ca-app-pub-5049280561472321/4969379702\"")
+            resValue("string", "app_Id", "\"ca-app-pub-3568615442442876~9923059144\"")
+            resValue("string", "banner_Id", "\"ca-app-pub-3568615442442876/7813337911\"")
+            resValue("string", "native_id", "\"ca-app-pub-3568615442442876/2716923906\"")
+            resValue("string", "interstitial_Id", "\"ca-app-pub-3568615442442876/5019653618\"")
+            resValue("string", "appopen_Id", "\"ca-app-pub-3568615442442876/5127464821\"")
+            resValue("string", "rewarded_interstitial_id", "\"ca-app-pub-3568615442442876/8743101192\"")
         }
         debug {
             isMinifyEnabled = false
@@ -135,8 +134,8 @@ dependencies {
     // CSV Writer
     implementation("org.apache.commons:commons-csv:1.12.0")
 
-    // Gemini Generative AI SDK
-    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+    // OkHttp (Groq AI API Client)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     // Monetization & Play Services (GMA Next-Gen SDK)
     implementation(libs.ads.mobile.sdk)

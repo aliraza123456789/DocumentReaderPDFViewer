@@ -314,7 +314,8 @@ fun AppNavigation(navController: NavHostController) {
                     onNavigateToImageToText = { navController.navigate(Screen.ImageToText) },
                     onNavigateToIdCardScanner = { navController.navigate(Screen.IdCardScanner) },
                     onNavigateToIdPhotoMaker = { navController.navigate(Screen.IdPhotoMaker) },
-                    onNavigateToAiReading = { navController.navigate(Screen.AiPaywall) },
+                    // onNavigateToAiReading = { navController.navigate(Screen.AiPaywall) }, // Fake subscription screen bypassed
+                    onNavigateToAiReading = { navController.navigate(Screen.AiReading) },
                     onNavigateToScanToExcel = { navController.navigate(Screen.ScanToExcel) },
                     onNavigateToOfficeToPdf = { navController.navigate(Screen.OfficeToPdf) },
                     onNavigateToWordToPdf = { navController.navigate(Screen.WordToPdf) },

@@ -25,6 +25,12 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdLoader
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdLoaderCallback
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdRequest
+import com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager
+import com.pdf.alldocument.office.pdfreaderapp.core.ads.FeedNativeAdView
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.*
 import com.pdf.alldocument.office.pdfreaderapp.domain.model.DocumentItem
 import com.pdf.alldocument.office.pdfreaderapp.domain.model.DocumentType
@@ -128,6 +134,15 @@ fun DocumentList(
     val context = androidx.compose.ui.platform.LocalContext.current
     val hasStoragePermission = com.pdf.alldocument.office.pdfreaderapp.MainActivity.hasStoragePermission(context)
 
+    val feedAdsMap = remember { mutableStateMapOf<Int, NativeAd>() }
+    DisposableEffect(Unit) {
+        onDispose {
+            feedAdsMap.values.forEach { it.destroy() }
+            feedAdsMap.clear()
+            AdMobManager.preloadNativeAd(context)
+        }
+    }
+
     if (documents.isEmpty()) {
         if (!hasStoragePermission) {
             EmptyStateComposable(
@@ -190,7 +205,10 @@ fun DocumentList(
                 // Sponsored slot every few real rows — mirrors the in-feed "AD" card in the mock.
                 val isSlot = showAds && index > 0 && (index + 1) % AD_SLOT_INTERVAL == 0
                 if (isSlot) {
-                    AdBannerCard()
+                    FeedNativeAdItem(
+                        slotIndex = index / AD_SLOT_INTERVAL,
+                        adsMap = feedAdsMap
+                    )
                 }
             }
         }
@@ -451,6 +469,62 @@ private fun extensionColor(extension: String): Color = when (extension.lowercase
     "ppt", "pptx", "pps", "ppsx" -> ColorPpt
     "txt", "log" -> ColorTxt
     else -> MaterialTheme.colorScheme.primary
+}
+
+/**
+ * In-feed sponsored Native Ad slot — loads real AdMob Native Ad and displays it
+ * with the exact same lavender card design (app icon, AD disclosure, headline,
+ * body description, and purple gradient CTA button).
+ */
+@Composable
+fun FeedNativeAdItem(
+    slotIndex: Int,
+    adsMap: MutableMap<Int, NativeAd>,
+    modifier: Modifier = Modifier
+) {
+    if (!AdMobManager.isAdEnabled(AdMobManager.KEY_FILE_READER_NATIVE)) return
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var loadAttempted by remember(slotIndex) { mutableStateOf(false) }
+
+    LaunchedEffect(slotIndex) {
+        if (!adsMap.containsKey(slotIndex) && !loadAttempted) {
+            loadAttempted = true
+            val preloaded = AdMobManager.consumePreloadedNativeAd()
+            if (preloaded != null) {
+                adsMap[slotIndex] = preloaded
+                AdMobManager.preloadNativeAd(context)
+            } else {
+                val targetId = AdMobManager.getNativeId(context)
+                val request = NativeAdRequest.Builder(
+                    targetId,
+                    listOf(NativeAd.NativeAdType.NATIVE)
+                ).build()
+                NativeAdLoader.load(
+                    request,
+                    object : NativeAdLoaderCallback {
+                        override fun onNativeAdLoaded(nativeAd: NativeAd) {
+                            adsMap[slotIndex] = nativeAd
+                        }
+
+                        override fun onAdFailedToLoad(adError: com.google.android.libraries.ads.mobile.sdk.common.LoadAdError) {
+                            android.util.Log.w("FeedNativeAd", "Ad failed to load: ${adError.message}")
+                        }
+                    }
+                )
+            }
+        }
+    }
+
+    val nativeAd = adsMap[slotIndex]
+    if (nativeAd != null) {
+        FeedNativeAdView(
+            nativeAd = nativeAd,
+            modifier = modifier
+        )
+    } else {
+        AdBannerCard(modifier = modifier)
+    }
 }
 
 /**

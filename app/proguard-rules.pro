@@ -41,9 +41,9 @@
 -keep class com.google.android.gms.vision.** { *; }
 -dontwarn com.google.android.gms.vision.**
 
-# Google Generative AI (Gemini) SDK
--keep class com.google.ai.client.generativeai.** { *; }
--dontwarn com.google.ai.client.generativeai.**
+# OkHttp (Groq AI)
+-dontwarn okhttp3.**
+-dontwarn okio.**
 
 # CameraX
 -keep class androidx.camera.** { *; }

@@ -1,4 +1,4 @@
-﻿package com.pdf.alldocument.office.pdfreaderapp.presentation.home
+package com.pdf.alldocument.office.pdfreaderapp.presentation.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -135,7 +135,8 @@ fun HomeScreen(
         topBar = {
             HomeTopBar(
                 onMenuClick = onNavigateToLanguage,
-                onSearchClick = onNavigateToSearch
+                onSearchClick = onNavigateToSearch,
+                onPremiumClick = onNavigateToPremium
             )
         }
     ) { padding ->

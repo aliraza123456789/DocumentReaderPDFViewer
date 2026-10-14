@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "17590965240",
-    "project_id": "all-document-reader-89728",
-    "storage_bucket": "all-document-reader-89728.firebasestorage.app"
+    "project_number": "809721569912",
+    "project_id": "pad-final",
+    "storage_bucket": "pad-final.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:17590965240:android:85711f5cda13c8f8207c0d",
+        "mobilesdk_app_id": "1:809721569912:android:e920347c7e7a88e63ec38d",
         "android_client_info": {
           "package_name": "com.pdf.alldocument.office.pdfreaderapp"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDqtLSch6nQFqwbt0Le8pc5j-KZhb-HPwc"
+          "current_key": "AIzaSyDWGQOaN5g6lTxLnZSW6L-Cl26JR5hjBRk"
         }
       ],
       "services": {

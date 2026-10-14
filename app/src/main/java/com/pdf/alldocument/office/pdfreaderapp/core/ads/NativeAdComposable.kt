@@ -65,11 +65,12 @@ fun BannerAdView(
 enum class NativeAdStyle {
     MEDIUM,
     SMALL,
-    HORIZONTAL_MEDIA
+    HORIZONTAL_MEDIA,
+    FEED
 }
 
 /**
- * Professional Native Ad Composable supporting Medium, Small & Horizontal Media styles,
+ * Professional Native Ad Composable supporting Medium, Small, Feed & Horizontal Media styles,
  * with proper asset view bindings (headline, body/advertiser, icon, media view, CTA)
  * ensuring 100% compliant AdMob impressions and clicks using GMA Next-Gen SDK.
  */
@@ -114,38 +115,115 @@ fun NativeAdCard(
     }
 
     if (currentNativeAd != null) {
-        Card(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 6.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            AndroidView(
-                modifier = Modifier.fillMaxWidth(),
-                factory = { ctx ->
-                    val layoutId = when (style) {
-                        NativeAdStyle.HORIZONTAL_MEDIA -> R.layout.layout_native_ad_horizontal_media
-                        NativeAdStyle.MEDIUM -> R.layout.layout_native_ad_view_medium
-                        NativeAdStyle.SMALL -> R.layout.lyt_native_small_banner
+        if (style == NativeAdStyle.FEED) {
+            Box(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+            ) {
+                AndroidView(
+                    modifier = Modifier.fillMaxWidth(),
+                    factory = { ctx ->
+                        val inflater = LayoutInflater.from(ctx)
+                        val nativeAdView = inflater.inflate(
+                            R.layout.layout_native_ad_feed,
+                            null,
+                            false
+                        ) as NativeAdView
+                        populateNativeView(currentNativeAd!!, nativeAdView)
+                        nativeAdView
+                    },
+                    update = { adView ->
+                        currentNativeAd?.let { populateNativeView(it, adView) }
                     }
-                    val inflater = LayoutInflater.from(ctx)
-                    val nativeAdView = inflater.inflate(
-                        layoutId,
-                        null,
-                        false
-                    ) as NativeAdView
-                    populateNativeView(currentNativeAd!!, nativeAdView)
-                    nativeAdView
-                },
-                update = { adView ->
-                    currentNativeAd?.let { populateNativeView(it, adView) }
-                }
-            )
+                )
+            }
+        } else {
+            Card(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                AndroidView(
+                    modifier = Modifier.fillMaxWidth(),
+                    factory = { ctx ->
+                        val layoutId = when (style) {
+                            NativeAdStyle.HORIZONTAL_MEDIA -> R.layout.layout_native_ad_horizontal_media
+                            NativeAdStyle.MEDIUM -> R.layout.layout_native_ad_view_medium
+                            NativeAdStyle.SMALL -> R.layout.lyt_native_small_banner
+                            NativeAdStyle.FEED -> R.layout.layout_native_ad_feed
+                        }
+                        val inflater = LayoutInflater.from(ctx)
+                        val nativeAdView = inflater.inflate(
+                            layoutId,
+                            null,
+                            false
+                        ) as NativeAdView
+                        populateNativeView(currentNativeAd!!, nativeAdView)
+                        nativeAdView
+                    },
+                    update = { adView ->
+                        currentNativeAd?.let { populateNativeView(it, adView) }
+                    }
+                )
+            }
         }
+    }
+}
+
+/**
+ * In-Feed Native Ad Card matching the document list feed item design:
+ * soft lavender container, rounded corners, ad icon, AD tag, headline, body description,
+ * and purple gradient CTA button.
+ */
+@Composable
+fun FeedNativeAdCard(
+    modifier: Modifier = Modifier,
+    adUnitId: String? = null,
+    adKey: String = AdMobManager.KEY_FILE_READER_NATIVE
+) {
+    NativeAdCard(
+        modifier = modifier,
+        adUnitId = adUnitId,
+        adKey = adKey,
+        style = NativeAdStyle.FEED
+    )
+}
+
+/**
+ * Direct View binding for a pre-loaded NativeAd in feed format.
+ */
+@Composable
+fun FeedNativeAdView(
+    nativeAd: NativeAd,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    ) {
+        AndroidView(
+            modifier = Modifier.fillMaxWidth(),
+            factory = { ctx ->
+                val inflater = LayoutInflater.from(ctx)
+                val nativeAdView = inflater.inflate(
+                    R.layout.layout_native_ad_feed,
+                    null,
+                    false
+                ) as NativeAdView
+                populateNativeView(nativeAd, nativeAdView)
+                nativeAdView
+            },
+            update = { adView ->
+                populateNativeView(nativeAd, adView)
+            }
+        )
     }
 }
 
@@ -166,41 +244,35 @@ fun MediumNativeAdCard(
     )
 }
 
-private fun populateNativeView(nativeAd: NativeAd, nativeAdView: NativeAdView) {
+fun populateNativeView(nativeAd: NativeAd, nativeAdView: NativeAdView) {
     val headlineView = nativeAdView.findViewById<TextView>(R.id.tv_primary)
     val secondaryView = nativeAdView.findViewById<TextView>(R.id.tv_secondary)
     val bodyView = nativeAdView.findViewById<TextView>(R.id.tv_body)
     val iconView = nativeAdView.findViewById<ImageView>(R.id.iv_icon)
-    val ctaButton = nativeAdView.findViewById<Button>(R.id.btn_cta)
+    val ctaButton = nativeAdView.findViewById<TextView>(R.id.btn_cta)
     val mediaView = nativeAdView.findViewById<com.google.android.libraries.ads.mobile.sdk.nativead.MediaView>(R.id.media_view)
 
     headlineView?.text = nativeAd.headline
     nativeAdView.headlineView = headlineView
 
     val advertiserOrStore = nativeAd.advertiser ?: nativeAd.store ?: ""
-    if (advertiserOrStore.isNotBlank()) {
+    val body = nativeAd.body ?: ""
+
+    if (bodyView != null) {
         secondaryView?.text = advertiserOrStore
-        secondaryView?.visibility = View.VISIBLE
-        nativeAdView.bodyView = secondaryView
+        secondaryView?.visibility = if (advertiserOrStore.isNotBlank()) View.VISIBLE else View.GONE
+        bodyView.text = body
+        bodyView.visibility = if (body.isNotBlank()) View.VISIBLE else View.GONE
+        nativeAdView.bodyView = bodyView
     } else {
-        val body = nativeAd.body ?: ""
-        if (bodyView == null && body.isNotBlank()) {
-            secondaryView?.text = body
+        // Single description field: prefer body pitch, fallback to advertiser
+        val desc = body.ifBlank { advertiserOrStore }
+        if (desc.isNotBlank()) {
+            secondaryView?.text = desc
             secondaryView?.visibility = View.VISIBLE
             nativeAdView.bodyView = secondaryView
         } else {
             secondaryView?.visibility = View.GONE
-        }
-    }
-
-    if (bodyView != null) {
-        val body = nativeAd.body ?: ""
-        if (body.isNotBlank()) {
-            bodyView.text = body
-            bodyView.visibility = View.VISIBLE
-            nativeAdView.bodyView = bodyView
-        } else {
-            bodyView.visibility = View.GONE
         }
     }
 
@@ -209,7 +281,8 @@ private fun populateNativeView(nativeAd: NativeAd, nativeAdView: NativeAdView) {
         iconView?.visibility = View.VISIBLE
         nativeAdView.iconView = iconView
     } else {
-        iconView?.visibility = View.GONE
+        iconView?.setImageResource(R.mipmap.ic_launcher)
+        iconView?.visibility = View.VISIBLE
     }
 
     val ctaText = if (!nativeAd.callToAction.isNullOrBlank()) nativeAd.callToAction else "Install"
