@@ -1,27 +1,37 @@
 package com.pdf.alldocument.office.pdfreaderapp.presentation.language
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pdf.alldocument.office.pdfreaderapp.core.ads.NativeAdCard
-import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.AppTopBar
+import com.pdf.alldocument.office.pdfreaderapp.core.ads.NativeAdStyle
 import com.pdf.alldocument.office.pdfreaderapp.core.localization.LanguageManager
 import com.pdf.alldocument.office.pdfreaderapp.core.localization.SupportedLanguage
 import kotlinx.coroutines.launch
+
+// Green colour that matches the "Done" button and selected radio in the reference design
+private val LangGreen = Color(0xFF34C759)
 
 @Composable
 fun LanguageScreen(
@@ -67,33 +77,78 @@ fun LanguageScreen(
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        containerColor = Color(0xFFF5F5F5),
         topBar = {
-            AppTopBar(
-                title = "Select Language",
-                onBackClick = onBack,
-                actions = {
-                    IconButton(
+            // Custom top bar replicating the reference image: "Languages" bold title + green "Done" button
+            Surface(
+                color = Color.White,
+                shadowElevation = 2.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .statusBarsPadding()
+                        .height(56.dp)
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Languages",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1A1A1A)
+                    )
+
+                    // Green "Done" pill button
+                    Button(
                         onClick = onConfirmSelection,
-                        enabled = !isProcessing
+                        enabled = !isProcessing,
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = LangGreen,
+                            disabledContainerColor = LangGreen.copy(alpha = 0.4f)
+                        ),
+                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 6.dp),
+                        modifier = Modifier.height(36.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "Select Language",
-                            tint = if (isProcessing) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f) else MaterialTheme.colorScheme.primary
+                        Text(
+                            text = "Done",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White
                         )
                     }
                 }
-            )
+            }
         },
         bottomBar = {
-            NativeAdCard()
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = Color.White,
+                tonalElevation = 2.dp,
+                shadowElevation = 6.dp
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(top = 4.dp, bottom = 4.dp)
+                ) {
+                    NativeAdCard(
+                        style = NativeAdStyle.HORIZONTAL_MEDIA
+                    )
+                }
+            }
         }
     ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(vertical = 8.dp)
+            contentPadding = PaddingValues(top = 8.dp, bottom = 16.dp)
         ) {
             items(viewModel.languages, key = { it.code }) { language ->
                 LanguageItem(
@@ -117,59 +172,120 @@ private fun LanguageItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected)
-        MaterialTheme.colorScheme.primaryContainer
-    else
-        MaterialTheme.colorScheme.surface
-
-    Row(
+    Surface(
+        color = Color.White,
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .background(backgroundColor)
-            .padding(horizontal = 20.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(1f)
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = language.flagEmoji,
-                style = MaterialTheme.typography.titleLarge
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(
-                    text = language.displayName,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                    color = if (isSelected)
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    else
-                        MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = language.nativeName,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
+            // Left: circular flag icon + language names
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
+            ) {
+                // Circular flag
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFEEEEEE))
+                ) {
+                    if (language.flagRes != 0) {
+                        Icon(
+                            painter = painterResource(id = language.flagRes),
+                            contentDescription = "${language.displayName} flag",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape),
+                            tint = Color.Unspecified
+                        )
+                    } else {
+                        // Fallback: emoji centred in circle
+                        Text(
+                            text = language.flagEmoji,
+                            fontSize = 24.sp,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+                }
 
-        if (isSelected) {
-            Icon(
-                imageVector = Icons.Default.Check,
-                contentDescription = "Selected",
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(22.dp)
-            )
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // Language name + native name
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = language.displayName,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF1A1A1A),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "(${language.nativeName})",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color(0xFF8A8A8A),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Right: radio button circle
+            RadioCircle(isSelected = isSelected)
         }
     }
 
     HorizontalDivider(
         modifier = Modifier.padding(horizontal = 20.dp),
-        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+        thickness = 0.5.dp,
+        color = Color(0xFFE0E0E0)
     )
+}
+
+/**
+ * Custom radio circle that renders exactly like the reference image:
+ * - Selected: filled green circle with white centre dot
+ * - Unselected: empty circle with grey border
+ */
+@Composable
+private fun RadioCircle(isSelected: Boolean) {
+    Box(
+        modifier = Modifier
+            .size(24.dp)
+            .clip(CircleShape)
+            .then(
+                if (isSelected) {
+                    Modifier.background(LangGreen)
+                } else {
+                    Modifier
+                        .background(Color.White)
+                        .border(1.5.dp, Color(0xFFCCCCCC), CircleShape)
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        if (isSelected) {
+            // Inner white dot
+            Box(
+                modifier = Modifier
+                    .size(9.dp)
+                    .clip(CircleShape)
+                    .background(Color.White)
+            )
+        }
+    }
 }

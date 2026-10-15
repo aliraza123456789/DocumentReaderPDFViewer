@@ -36,10 +36,11 @@ data class AiReadingUiState(
 )
 
 enum class QuickAction(val label: String, val prompt: String) {
-    SUMMARIZE("Summarize Document", "Summarize this document in a clear, concise way with a short overview and bullet points."),
-    KEY_TAKEAWAYS("Key Takeaways", "Extract the key takeaways from this document as a numbered list."),
-    EXPLAIN_TERMS("Explain Complex Terms", "Identify complex or technical terms in this document and explain each in simple language."),
-    QA("Generate Q&A", "Generate 8 useful question-and-answer pairs based on this document.")
+    SUMMARIZE("Summarize", "Summarize this document in a clear, concise way with an overview and key points."),
+    STUDY_NOTES("Study Notes", "Generate comprehensive study & revision notes from this document with bullet points, key definitions, and formulas."),
+    QA("Generate Quiz", "Generate 5-8 useful quiz questions (with answers and explanations) based on this document."),
+    KEY_TAKEAWAYS("Key Takeaways", "Extract the key takeaways and important points from this document as a numbered list."),
+    EXPLAIN_TERMS("Explain Terms", "Identify complex or technical terms in this document and explain each in simple, easy-to-understand language.")
 }
 
 @HiltViewModel
@@ -73,8 +74,20 @@ class AiReadingViewModel @Inject constructor(
                 }
                 val truncated = full.length > MAX_DOC_CHARS
                 val text = if (truncated) full.take(MAX_DOC_CHARS) else full
-                //chat = buildModel(text).startChat()
-                _uiState.update { it.copy(isExtracting = false, documentChars = full.length, truncated = truncated) }
+                val apiKey = BuildConfig.GEMINI_API_KEY
+                if (apiKey.isBlank()) {
+                    _uiState.update {
+                        it.copy(
+                            isExtracting = false,
+                            documentChars = full.length,
+                            truncated = truncated,
+                            error = "GEMINI_API_KEY missing. Please add GEMINI_API_KEY in local.properties"
+                        )
+                    }
+                    return@launch
+                }
+                chat = buildModel(text, apiKey).startChat()
+                _uiState.update { it.copy(isExtracting = false, documentChars = full.length, truncated = truncated, error = null) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isExtracting = false, error = e.message ?: "Failed to read document") }
             }
@@ -86,23 +99,32 @@ class AiReadingViewModel @Inject constructor(
             PDDocument.load(input).use { doc -> PDFTextStripper().getText(doc) }
         }
 
- /*   private fun buildModel(documentText: String) = GenerativeModel(
+    private fun buildModel(documentText: String, apiKey: String) = GenerativeModel(
         modelName = MODEL,
-        apiKey = BuildConfig.GEMINI_API_KEY,
+        apiKey = apiKey,
         generationConfig = generationConfig { temperature = 0.4f },
         systemInstruction = content {
             text(
-                "You are a document reading assistant. Answer ONLY using the document below. " +
-                "If the answer is not in the document, say so. Reply in the user's language.\n\n" +
+                "You are an expert document reading assistant and study helper. Answer clearly, accurately, and helpfully using the document below. " +
+                "If the answer is not in the document, say so politely. Reply in the user's language.\n\n" +
                 "=== DOCUMENT START ===\n$documentText\n=== DOCUMENT END ==="
             )
         }
-    )*/
+    )
 
     fun runQuickAction(a: QuickAction) = send(a.prompt, displayText = a.label)
 
     fun send(prompt: String, displayText: String = prompt) {
-        val c = chat ?: return
+        val c = chat
+        if (c == null) {
+            val key = BuildConfig.GEMINI_API_KEY
+            if (key.isBlank()) {
+                _uiState.update { it.copy(error = "GEMINI_API_KEY missing in local.properties") }
+            } else if (_uiState.value.documentName == null) {
+                _uiState.update { it.copy(error = "Please open a document first") }
+            }
+            return
+        }
         if (prompt.isBlank() || _uiState.value.isResponding) return
         val userMsg = ChatMessage(nextId++, true, displayText)
         val aiId = nextId++

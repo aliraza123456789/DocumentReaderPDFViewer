@@ -96,16 +96,16 @@ class AdMobManager @Inject constructor() {
             com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdLoader.load(
                 request,
                 object : com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdLoaderCallback {
-                    override fun onNativeAdLoaded(ad: com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd) {
+                    override fun onNativeAdLoaded(nativeAd: com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd) {
                         isNativeLoading = false
                         preloadedNativeAd?.destroy()
-                        preloadedNativeAd = ad
+                        preloadedNativeAd = nativeAd
                         Log.d(TAG, "Preloaded Native Ad ready")
                     }
 
-                    override fun onAdFailedToLoad(error: com.google.android.libraries.ads.mobile.sdk.common.LoadAdError) {
+                    override fun onAdFailedToLoad(adError: com.google.android.libraries.ads.mobile.sdk.common.LoadAdError) {
                         isNativeLoading = false
-                        Log.w(TAG, "Failed to preload Native Ad: ${error.message}")
+                        Log.w(TAG, "Failed to preload Native Ad: ${adError.message}")
                     }
                 }
             )

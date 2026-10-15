@@ -1,4 +1,4 @@
-package com.pdf.alldocument.office.pdfreaderapp.presentation.tools.imagetotext
+﻿package com.pdf.alldocument.office.pdfreaderapp.presentation.tools.imagetotext
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -36,7 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.pdf.alldocument.office.pdfreaderapp.core.util.FileUtils
 import com.pdf.alldocument.office.pdfreaderapp.core.util.MimeTypes

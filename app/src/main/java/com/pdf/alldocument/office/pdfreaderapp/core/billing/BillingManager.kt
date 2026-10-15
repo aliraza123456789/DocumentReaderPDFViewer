@@ -39,6 +39,11 @@ class BillingManager @Inject constructor(
         const val PRODUCT_LIFETIME = "lifetime_pro"
     }
 
+    fun setFakePremium(isPremium: Boolean = true) {
+        _purchaseState.value = if (isPremium) PurchaseState.Subscribed else PurchaseState.Free
+        analyticsManager.setUserPremiumStatus(isPremium)
+    }
+
     init {
         startConnection()
     }

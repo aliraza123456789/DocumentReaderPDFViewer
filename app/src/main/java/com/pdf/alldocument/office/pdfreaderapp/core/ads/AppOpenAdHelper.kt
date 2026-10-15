@@ -78,10 +78,10 @@ class AppOpenAdHelper @Inject constructor(
                     Log.d(TAG, "GMA Next-Gen AppOpenAd loaded successfully.")
                 }
 
-                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
                     appOpenAd = null
                     isAdLoading = false
-                    Log.e(TAG, "GMA Next-Gen AppOpenAd failed to load: ${loadAdError.message}")
+                    Log.e(TAG, "GMA Next-Gen AppOpenAd failed to load: ${adError.message}")
                 }
             }
         )
@@ -121,7 +121,7 @@ class AppOpenAdHelper @Inject constructor(
                     onDismiss()
                 }
 
-                override fun onAdFailedToShowFullScreenContent(error: FullScreenContentError) {
+                override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
                     appOpenAd = null
                     isShowingAd = false
                     isAlreadyShowingAd = false

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Russia Flag (Russian) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+  <path android:fillColor="#D52B1E" android:pathData="M24,24m-24,0a24,24 0,1 1,48 0a24,24 0,1 1,-48 0"/>
+  <!-- White top band -->
+  <path android:fillColor="#FFFFFF" android:pathData="M0,0 L48,0 L48,16 L0,16 Z"/>
+  <!-- Blue middle band -->
+  <path android:fillColor="#0039A6" android:pathData="M0,16 L48,16 L48,32 L0,32 Z"/>
+</vector>

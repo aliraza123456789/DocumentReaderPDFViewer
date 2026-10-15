@@ -25,7 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pdf.alldocument.office.pdfreaderapp.core.util.FileUtils
 import com.pdf.alldocument.office.pdfreaderapp.presentation.tools.tactileClick
 import com.pdf.alldocument.office.pdfreaderapp.presentation.pdftools.tools.VibrantActionButton
@@ -140,7 +140,7 @@ fun IdPhotoScreen(onBack: () -> Unit, viewModel: IdPhotoViewModel = hiltViewMode
                             Image(it.asImageBitmap(), "Preview", Modifier.height(240.dp).padding(4.dp))
                         }
                         
-                        Divider(color = Color(0xFFF1F5F9), modifier = Modifier.padding(vertical = 12.dp))
+                        HorizontalDivider(color = Color(0xFFF1F5F9), modifier = Modifier.padding(vertical = 12.dp))
                         
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {

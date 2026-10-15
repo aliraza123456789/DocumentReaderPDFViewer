@@ -1,4 +1,4 @@
-package com.pdf.alldocument.office.pdfreaderapp.presentation.pdftools.home
+﻿package com.pdf.alldocument.office.pdfreaderapp.presentation.pdftools.home
 
 import android.content.Context
 import android.os.Bundle
@@ -30,7 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pdf.alldocument.office.pdfreaderapp.presentation.pdftools.components.FeatureCard
 import com.pdf.alldocument.office.pdfreaderapp.presentation.pdftools.components.FeatureSection

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Saudi Arabia Flag (Arabic) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+  <path android:fillColor="#006C35" android:pathData="M24,24m-24,0a24,24 0,1 1,48 0a24,24 0,1 1,-48 0"/>
+  <!-- White sword simplified as rectangle -->
+  <path android:fillColor="#FFFFFF" android:pathData="M10,22 L38,22 L38,24 L10,24 Z"/>
+  <path android:fillColor="#FFFFFF" android:pathData="M34,20 L38,22 L34,24 Z"/>
+  <!-- Shahada text simplified as two white lines -->
+  <path android:fillColor="#FFFFFF" android:pathData="M10,16 Q18,13 24,16 Q30,19 38,16 L38,18 Q30,21 24,18 Q18,15 10,18 Z"/>
+</vector>

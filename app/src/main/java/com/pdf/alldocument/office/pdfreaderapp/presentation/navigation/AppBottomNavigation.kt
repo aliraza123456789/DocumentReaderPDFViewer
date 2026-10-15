@@ -1,72 +1,71 @@
 package com.pdf.alldocument.office.pdfreaderapp.presentation.navigation
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.BrandPurple
+import com.pdf.alldocument.office.pdfreaderapp.R
 
 enum class AppBottomDestination(
     val route: Screen,
     val label: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector
+    val selectedIcon: ImageVector? = null,
+    val unselectedIcon: ImageVector,
+    val selectedDrawableRes: Int? = null
 ) {
     HOME(
         route = Screen.Home,
         label = "Home",
-        selectedIcon = Icons.Filled.Home,
+        selectedDrawableRes = R.drawable.home,
         unselectedIcon = Icons.Outlined.Home
     ),
     RECENT(
         route = Screen.Recent,
         label = "Recent",
-        selectedIcon = Icons.Outlined.Schedule,
+        selectedIcon = Icons.Filled.Schedule,
         unselectedIcon = Icons.Outlined.Schedule
     ),
     FAVOURITES(
         route = Screen.Favorites,
         label = "Favourite",
-        selectedIcon = Icons.Outlined.StarOutline,
+        selectedIcon = Icons.Filled.Star,
         unselectedIcon = Icons.Outlined.StarOutline
     ),
     TOOLS(
         route = Screen.ToolsHome,
         label = "Tools",
-        selectedIcon = Icons.Outlined.GridView,
+        selectedIcon = Icons.Filled.GridView,
         unselectedIcon = Icons.Outlined.GridView
     )
 }
 
 /**
- * Modern Floating Island Dock Bottom Navigation.
- * Distinct from generic competitor clone bars:
- * - Floating rounded card with soft ambient elevation
- * - Capsule tonal pill highlight around active icon & text
- * - No competitor-style underline strip
+ * Bottom navigation bar matching the UI:
+ * - Selected tab: FILLED icon, GREEN color (#22C55E), semi-bold text
+ * - Unselected tab: OUTLINED icon, GREY color (#9CA3AF), normal text
+ * - Fixes Home tab staying green all the time.
  */
 @Composable
 fun AppBottomNavigation(
@@ -74,24 +73,22 @@ fun AppBottomNavigation(
     onDestinationSelected: (AppBottomDestination) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
+    val activeGreen = Color(0xFF22C55E)
+    val inactiveGrey = Color(0xFF9CA3AF)
+
+    Column(
         modifier = modifier
             .fillMaxWidth()
+            .background(Color.White)
             .navigationBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        contentAlignment = Alignment.Center
     ) {
+        // Thin top divider
+        HorizontalDivider(color = Color(0xFFEEEEEE), thickness = 0.8.dp)
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .shadow(
-                    elevation = 10.dp,
-                    shape = RoundedCornerShape(24.dp),
-                    spotColor = Color(0x224F46E5)
-                )
-                .clip(RoundedCornerShape(24.dp))
-                .background(Color.White)
-                .padding(horizontal = 8.dp, vertical = 6.dp),
+                .height(64.dp),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -99,47 +96,54 @@ fun AppBottomNavigation(
                 val isSelected = destination == selectedDestination
                 val interactionSource = remember { MutableInteractionSource() }
 
-                val iconTint by animateColorAsState(
-                    targetValue = if (isSelected) BrandPurple else Color(0xFF94A3B8),
-                    animationSpec = tween(100),
-                    label = "iconTint"
-                )
+                val itemColor = if (isSelected) activeGreen else inactiveGrey
 
-                Box(
+                Column(
                     modifier = Modifier
                         .weight(1f)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(
-                            if (isSelected) Color(0xFFEEF2FF) else Color.Transparent
-                        )
+                        .fillMaxHeight()
                         .clickable(
                             interactionSource = interactionSource,
                             indication = null,
                             onClick = { onDestinationSelected(destination) }
-                        )
-                        .padding(vertical = 6.dp),
-                    contentAlignment = Alignment.Center
+                        ),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
+                    if (destination == AppBottomDestination.HOME && isSelected && destination.selectedDrawableRes != null) {
+                        // Home selected: Use custom filled SVG home icon tinted green
                         Icon(
-                            imageVector = if (isSelected) destination.selectedIcon else destination.unselectedIcon,
+                            painter = painterResource(id = destination.selectedDrawableRes),
                             contentDescription = destination.label,
-                            modifier = Modifier.size(22.dp),
-                            tint = iconTint
+                            modifier = Modifier.size(24.dp),
+                            tint = itemColor
                         )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = destination.label,
-                            fontSize = 11.sp,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                            color = iconTint
+                    } else {
+                        // Outlined icon when unselected, filled icon when selected
+                        val iconVector = if (isSelected) {
+                            destination.selectedIcon ?: destination.unselectedIcon
+                        } else {
+                            destination.unselectedIcon
+                        }
+                        Icon(
+                            imageVector = iconVector,
+                            contentDescription = destination.label,
+                            modifier = Modifier.size(24.dp),
+                            tint = itemColor
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(3.dp))
+
+                    Text(
+                        text = destination.label,
+                        fontSize = 11.sp,
+                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                        color = itemColor
+                    )
                 }
             }
         }
     }
 }
+

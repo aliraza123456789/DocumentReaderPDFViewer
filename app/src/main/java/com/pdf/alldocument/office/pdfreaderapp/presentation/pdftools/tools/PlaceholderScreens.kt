@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pdf.alldocument.office.pdfreaderapp.presentation.pdftools.components.ToolScaffold
 import com.pdf.alldocument.office.pdfreaderapp.presentation.pdftools.screens.TabsViewModel
@@ -269,7 +269,7 @@ fun AddTextScreen(onBack: () -> Unit) {
                                             PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, true, true).use { cs ->
                                                 cs.beginText()
                                                 cs.setFont(PDType1Font.HELVETICA_BOLD, fontSize)
-                                                cs.setNonStrokingColor(40, 40, 40)
+                                                cs.setNonStrokingColor(40f / 255f, 40f / 255f, 40f / 255f)
                                                 val yOffset = when (textPosition) {
                                                     "Top" -> page.mediaBox.height - 40f
                                                     "Center" -> page.mediaBox.height / 2f

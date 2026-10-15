@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -19,11 +21,14 @@ android {
         versionCode = 4
         versionName = "1.0.4"
 
-//        val props = java.util.Properties().apply {
-//            val f = rootProject.file("local.properties")
-//            if (f.exists()) f.inputStream().use { load(it) }
-//        }
-  //      buildConfigField("String", "GEMINI_API_KEY", "\"${props.getProperty("GEMINI_API_KEY", "")}\"")
+        val props = Properties().apply {
+            val f = rootProject.file("local.properties")
+            if (f.exists()) {
+                f.inputStream().use { load(it) }
+            }
+        }
+        buildConfigField("String", "GEMINI_API_KEY", "\"${props.getProperty("GEMINI_API_KEY", "")}\"")
+        buildConfigField("String", "GROQ_API_KEY", "\"${props.getProperty("GROQ_API_KEY", "")}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -67,14 +72,6 @@ android {
     }
 }
 
-// Kotlin 2.2 warns that annotations on constructor value parameters (e.g. Hilt's
-// @ApplicationContext on `private val context: Context`) will start targeting the
-// backing field/property. Opt in now so the behaviour is stable before it flips.
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xannotation-default-target=param-property")
-    }
-}
 
 dependencies {
     // AndroidX & Lifecycle

@@ -1,4 +1,4 @@
-package com.pdf.alldocument.office.pdfreaderapp.presentation.tools.pdftoword
+﻿package com.pdf.alldocument.office.pdfreaderapp.presentation.tools.pdftoword
 
 import android.content.ActivityNotFoundException
 import android.provider.OpenableColumns
@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pdf.alldocument.office.pdfreaderapp.core.util.FileUtils
 import com.pdf.alldocument.office.pdfreaderapp.presentation.pdftools.tools.AttractiveFileSelector
 import com.pdf.alldocument.office.pdfreaderapp.presentation.pdftools.tools.VibrantActionButton

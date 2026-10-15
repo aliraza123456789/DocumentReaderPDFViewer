@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pdf.alldocument.office.pdfreaderapp.core.util.FileUtils
 import com.pdf.alldocument.office.pdfreaderapp.common.MimeTypes
@@ -238,7 +238,7 @@ private fun PreviewStep(state: IdCardUiState, vm: IdCardScannerViewModel, onShar
                     }
                 }
                 
-                Divider(color = Color(0xFFE2E8F0), thickness = 1.dp, modifier = Modifier.padding(horizontal = 32.dp))
+                HorizontalDivider(color = Color(0xFFE2E8F0), thickness = 1.dp, modifier = Modifier.padding(horizontal = 32.dp))
                 
                 state.back?.let { 
                     Box(modifier = Modifier.weight(1f).padding(8.dp)) {
@@ -281,7 +281,7 @@ private fun PreviewStep(state: IdCardUiState, vm: IdCardScannerViewModel, onShar
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text("PDF Exported!", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFF065F46))
-                        Text(state.pdf!!.name, fontSize = 11.sp, color = Color(0xFF047857))
+                        Text(state.pdf.name, fontSize = 11.sp, color = Color(0xFF047857))
                     }
                     IconButton(onClick = onOpen) { Icon(Icons.Default.Visibility, "View", tint = Color(0xFF059669)) }
                     IconButton(onClick = onShare) { Icon(Icons.Default.Share, "Share", tint = Color(0xFF059669)) }

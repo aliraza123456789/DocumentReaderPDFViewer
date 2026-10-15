@@ -1,4 +1,4 @@
-package com.pdf.alldocument.office.pdfreaderapp.presentation.tools.split
+﻿package com.pdf.alldocument.office.pdfreaderapp.presentation.tools.split
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pdf.alldocument.office.pdfreaderapp.core.ads.NativeAdCard
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.LottieLoadingIndicator

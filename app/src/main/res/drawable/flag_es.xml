@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Spain Flag (Spanish) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+  <!-- Circular clip approximation using bands -->
+  <path android:fillColor="#AA151B" android:pathData="M24,24m-24,0a24,24 0,1 1,48 0a24,24 0,1 1,-48 0"/>
+  <!-- Yellow middle band -->
+  <path android:fillColor="#F1BF00" android:pathData="M0,15.5 L48,15.5 L48,32.5 L0,32.5 Z"/>
+</vector>

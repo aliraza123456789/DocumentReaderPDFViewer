@@ -42,10 +42,10 @@ class InterstitialAdHelper @Inject constructor(
                     Log.d(TAG, "GMA Next-Gen InterstitialAd loaded successfully.")
                 }
 
-                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
                     interstitialAd = null
                     isAdLoading = false
-                    Log.e(TAG, "GMA Next-Gen InterstitialAd failed to load: ${loadAdError.message}")
+                    Log.e(TAG, "GMA Next-Gen InterstitialAd failed to load: ${adError.message}")
                 }
             }
         )
@@ -87,7 +87,7 @@ class InterstitialAdHelper @Inject constructor(
                     }
                 }
 
-                override fun onAdFailedToShowFullScreenContent(error: FullScreenContentError) {
+                override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
                     interstitialAd = null
                     AdMobManager.isInterstitialShowing = false
                     AppOpenAdHelper.isAlreadyShowingAd = false

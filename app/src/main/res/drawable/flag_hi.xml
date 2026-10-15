@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- India Flag (Hindi) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+  <path android:fillColor="#FFFFFF" android:pathData="M24,24m-24,0a24,24 0,1 1,48 0a24,24 0,1 1,-48 0"/>
+  <!-- Saffron top band -->
+  <path android:fillColor="#FF9933" android:pathData="M0,0 L48,0 L48,16 L0,16 Z"/>
+  <!-- Green bottom band -->
+  <path android:fillColor="#138808" android:pathData="M0,32 L48,32 L48,48 L0,48 Z"/>
+  <!-- Ashoka Chakra (simplified blue circle) -->
+  <path android:fillColor="#000080" android:pathData="M24,24m-7,0a7,7 0,1 1,14 0a7,7 0,1 1,-14 0"/>
+  <path android:fillColor="#FFFFFF" android:pathData="M24,24m-5.5,0a5.5,5.5 0,1 1,11 0a5.5,5.5 0,1 1,-11 0"/>
+  <path android:fillColor="#000080" android:pathData="M24,24m-1.5,0a1.5,1.5 0,1 1,3 0a1.5,1.5 0,1 1,-3 0"/>
+</vector>

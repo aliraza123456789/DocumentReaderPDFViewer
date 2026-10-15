@@ -1,4 +1,4 @@
-package com.pdf.alldocument.office.pdfreaderapp.presentation.tools.scantoexcel
+﻿package com.pdf.alldocument.office.pdfreaderapp.presentation.tools.scantoexcel
 
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -28,7 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pdf.alldocument.office.pdfreaderapp.core.util.FileUtils
 import com.pdf.alldocument.office.pdfreaderapp.presentation.tools.tactileClick
 import com.pdf.alldocument.office.pdfreaderapp.presentation.pdftools.tools.VibrantActionButton

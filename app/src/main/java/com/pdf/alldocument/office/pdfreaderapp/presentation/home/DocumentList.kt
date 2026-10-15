@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -18,12 +17,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +29,7 @@ import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.*
 import com.pdf.alldocument.office.pdfreaderapp.domain.model.DocumentItem
 import com.pdf.alldocument.office.pdfreaderapp.domain.model.DocumentType
 import com.pdf.alldocument.office.pdfreaderapp.domain.model.SortOrder
+
 
 /**
  * Per-type accent for a selected filter tab — PDF turns red, Word blue, PPT
@@ -421,96 +418,28 @@ fun DocumentGridCard(
 }
 
 /**
- * Doc-type badge: rounded square with a per-type linear gradient, a white
- * page silhouette (folded corner) drawn behind a bold type label.
+ * Doc-type badge using the imported SVG drawables (pdficon, docicon, xlsicon,
+ * ppticon, txticon) — exactly matching the mockup icon set.
  */
 @Composable
 fun DocTypeIcon(
     extension: String,
     size: androidx.compose.ui.unit.Dp = 56.dp
 ) {
-    val (color, label) = when (extension.lowercase()) {
-        "pdf" -> ColorPdf to "PDF"
-        "doc", "docx", "dot", "dotx" -> ColorWord to "DOC"
-        "xls", "xlsx", "csv" -> ColorExcel to "XLS"
-        "ppt", "pptx", "pps", "ppsx" -> ColorPpt to "PPT"
-        "txt", "log" -> ColorTxt to "TXT"
-        else -> MaterialTheme.colorScheme.primary to "FILE"
+    val drawableRes = when (extension.lowercase()) {
+        "pdf"                         -> com.pdf.alldocument.office.pdfreaderapp.R.drawable.pdficon
+        "doc", "docx", "dot", "dotx" -> com.pdf.alldocument.office.pdfreaderapp.R.drawable.docicon
+        "xls", "xlsx", "csv"         -> com.pdf.alldocument.office.pdfreaderapp.R.drawable.xlsicon
+        "ppt", "pptx", "pps", "ppsx" -> com.pdf.alldocument.office.pdfreaderapp.R.drawable.ppticon
+        "txt", "log"                  -> com.pdf.alldocument.office.pdfreaderapp.R.drawable.txticon
+        else                          -> com.pdf.alldocument.office.pdfreaderapp.R.drawable.docicon
     }
 
-    val gradient = remember(color) {
-        Brush.linearGradient(listOf(color, lerp(color, Color.White, 0.30f)))
-    }
-
-    val path = remember { Path() }
-
-    Box(
-        modifier = Modifier
-            .size(size)
-            .clip(RoundedCornerShape(12.dp))
-            .background(gradient),
-        contentAlignment = Alignment.Center
-    ) {
-        // White page silhouette with a folded top-right corner.
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val w = this.size.width
-            val h = this.size.height
-            val pageW = w * 0.46f
-            val pageH = h * 0.60f
-            val left = (w - pageW) / 2f
-            val top = (h - pageH) / 2f
-            val fold = pageW * 0.30f
-            path.reset()
-            path.moveTo(left, top)
-            path.lineTo(left + pageW - fold, top)
-            path.lineTo(left + pageW, top + fold)
-            path.lineTo(left + pageW, top + pageH)
-            path.lineTo(left, top + pageH)
-            path.close()
-            drawPath(path, color = Color.White)
-            // Fold crease.
-            drawLine(
-                color = color,
-                start = Offset(left + pageW - fold, top),
-                end = Offset(left + pageW - fold, top + fold),
-                strokeWidth = 2f
-            )
-            drawLine(
-                color = color,
-                start = Offset(left + pageW - fold, top + fold),
-                end = Offset(left + pageW, top + fold),
-                strokeWidth = 2f
-            )
-        }
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
-            color = color
-        )
-
-        // Small pie-chart accent under the label — only for PPT, matching the mock.
-        if (extension.lowercase() in listOf("ppt", "pptx", "pps", "ppsx")) {
-            Canvas(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(4.dp)
-                    .size(size * 0.24f)
-            ) {
-                val r = this.size.minDimension / 2f
-                val c = Offset(this.size.width / 2f, this.size.height / 2f)
-                drawCircle(color = Color.White, radius = r, center = c)
-                drawArc(
-                    color = color,
-                    startAngle = -90f,
-                    sweepAngle = 130f,
-                    useCenter = true,
-                    topLeft = Offset(c.x - r, c.y - r),
-                    size = androidx.compose.ui.geometry.Size(r * 2, r * 2)
-                )
-            }
-        }
-    }
+    Image(
+        painter = androidx.compose.ui.res.painterResource(id = drawableRes),
+        contentDescription = extension.uppercase(),
+        modifier = Modifier.size(size)
+    )
 }
 
 /** Maps a file extension to the same brand color used on its [DocTypeIcon]. */

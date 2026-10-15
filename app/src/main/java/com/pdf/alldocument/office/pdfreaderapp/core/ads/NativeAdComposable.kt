@@ -28,9 +28,7 @@ import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdRequest
 import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdView
 import com.pdf.alldocument.office.pdfreaderapp.R
 
-/**
- * Standard Small Banner Ad (320x50 standard banner) using GMA Next-Gen SDK.
- */
+
 @Composable
 fun BannerAdView(
     modifier: Modifier = Modifier,
@@ -51,7 +49,7 @@ fun BannerAdView(
                     bannerRequest,
                     object : AdLoadCallback<BannerAd> {
                         override fun onAdLoaded(ad: BannerAd) {}
-                        override fun onAdFailedToLoad(error: LoadAdError) {}
+                        override fun onAdFailedToLoad(adError: LoadAdError) {}
                     }
                 )
             }
@@ -66,11 +64,12 @@ fun BannerAdView(
  */
 enum class NativeAdStyle {
     MEDIUM,
-    SMALL
+    SMALL,
+    HORIZONTAL_MEDIA
 }
 
 /**
- * Professional Native Ad Composable supporting Medium & Small styles,
+ * Professional Native Ad Composable supporting Medium, Small & Horizontal Media styles,
  * with proper asset view bindings (headline, body/advertiser, icon, media view, CTA)
  * ensuring 100% compliant AdMob impressions and clicks using GMA Next-Gen SDK.
  */
@@ -85,10 +84,10 @@ fun NativeAdCard(
 
     val context = LocalContext.current
     val targetId = adUnitId ?: AdMobManager.getNativeId(context)
-    var nativeAd by remember { mutableStateOf<NativeAd?>(AdMobManager.consumePreloadedNativeAd()) }
+    var currentNativeAd by remember { mutableStateOf<NativeAd?>(AdMobManager.consumePreloadedNativeAd()) }
 
     DisposableEffect(targetId) {
-        if (nativeAd == null) {
+        if (currentNativeAd == null) {
             val request = NativeAdRequest.Builder(
                 targetId,
                 listOf(com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd.NativeAdType.NATIVE)
@@ -96,25 +95,25 @@ fun NativeAdCard(
             NativeAdLoader.load(
                 request,
                 object : NativeAdLoaderCallback {
-                    override fun onNativeAdLoaded(ad: NativeAd) {
-                        nativeAd?.destroy()
-                        nativeAd = ad
+                    override fun onNativeAdLoaded(nativeAd: NativeAd) {
+                        currentNativeAd?.destroy()
+                        currentNativeAd = nativeAd
                     }
 
-                    override fun onAdFailedToLoad(error: LoadAdError) {
-                        nativeAd = null
+                    override fun onAdFailedToLoad(adError: LoadAdError) {
+                        currentNativeAd = null
                     }
                 }
             )
         }
 
         onDispose {
-            nativeAd?.destroy()
+            currentNativeAd?.destroy()
             AdMobManager.preloadNativeAd(context)
         }
     }
 
-    if (nativeAd != null) {
+    if (currentNativeAd != null) {
         Card(
             modifier = modifier
                 .fillMaxWidth()
@@ -128,10 +127,10 @@ fun NativeAdCard(
             AndroidView(
                 modifier = Modifier.fillMaxWidth(),
                 factory = { ctx ->
-                    val layoutId = if (style == NativeAdStyle.MEDIUM) {
-                        R.layout.layout_native_ad_view_medium
-                    } else {
-                        R.layout.lyt_native_small_banner
+                    val layoutId = when (style) {
+                        NativeAdStyle.HORIZONTAL_MEDIA -> R.layout.layout_native_ad_horizontal_media
+                        NativeAdStyle.MEDIUM -> R.layout.layout_native_ad_view_medium
+                        NativeAdStyle.SMALL -> R.layout.lyt_native_small_banner
                     }
                     val inflater = LayoutInflater.from(ctx)
                     val nativeAdView = inflater.inflate(
@@ -139,11 +138,11 @@ fun NativeAdCard(
                         null,
                         false
                     ) as NativeAdView
-                    populateNativeView(nativeAd!!, nativeAdView)
+                    populateNativeView(currentNativeAd!!, nativeAdView)
                     nativeAdView
                 },
                 update = { adView ->
-                    nativeAd?.let { populateNativeView(it, adView) }
+                    currentNativeAd?.let { populateNativeView(it, adView) }
                 }
             )
         }
@@ -218,5 +217,5 @@ private fun populateNativeView(nativeAd: NativeAd, nativeAdView: NativeAdView) {
     ctaButton?.visibility = View.VISIBLE
     nativeAdView.callToActionView = ctaButton
 
-    nativeAdView.registerNativeAd(nativeAd, null)
+    nativeAdView.registerNativeAd(nativeAd, mediaView)
 }

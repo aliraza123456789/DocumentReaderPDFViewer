@@ -1,4 +1,4 @@
-package com.pdf.alldocument.office.pdfreaderapp.presentation.home
+﻿package com.pdf.alldocument.office.pdfreaderapp.presentation.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,7 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pdf.alldocument.office.pdfreaderapp.R
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.BrandPurple
@@ -247,67 +247,68 @@ fun HomeScreen(
 }
 
 /**
- * Redesigned top bar: clean title + subtitle on the left, three focused
- * action buttons on the right (Language, Premium, Grid-toggle). The old
- * Search pill, Scan, and Sort buttons have been removed from this bar —
- * Sort now lives in the DocumentListHeader row below the tabs.
+ * Top bar matching the "My Documents" mock:
+ * Left — bold title "My Documents" + grey subtitle.
+ * Right — Search, Crown (premium), Language globe icons.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeTopBar(
     onMenuClick: () -> Unit,
-    onSearchClick: () -> Unit
+    onSearchClick: () -> Unit,
+    onPremiumClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // App Icon
-        Image(
-            painter = painterResource(id = R.drawable.splash_pdf_icon),
-            contentDescription = "App Icon",
-            modifier = Modifier
-                .size(42.dp)
-                .clip(RoundedCornerShape(10.dp))
-        )
-
-        Spacer(modifier = Modifier.width(12.dp))
-
         // LEFT — title + subtitle
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Document Reader",
+                text = "My Documents",
                 fontWeight = FontWeight.Bold,
-                fontSize = 19.sp,
+                fontSize = 20.sp,
                 color = Color(0xFF111827)
             )
             Text(
                 text = "Your personal library",
-                fontSize = 12.sp,
+                fontSize = 13.sp,
                 color = Color(0xFF94A3B8)
             )
         }
 
-        // RIGHT — icon buttons
+        // RIGHT — Search | Crown | Globe
         Row(verticalAlignment = Alignment.CenterVertically) {
             // Search
             IconButton(onClick = onSearchClick) {
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = "Search",
-                    tint = Color(0xFF374151)
+                    tint = Color(0xFF374151),
+                    modifier = Modifier.size(22.dp)
                 )
             }
 
-            // Language (replaces hamburger menu)
+            // Crown — premium upsell (orange gradient icon from SVG drawable)
+            IconButton(onClick = onPremiumClick) {
+                Icon(
+                    painter = painterResource(id = R.drawable.crownicon),
+                    contentDescription = "Premium",
+                    tint = Color.Unspecified,   // keeps SVG gradient colours
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+
+            // Language / Globe
             IconButton(onClick = onMenuClick) {
                 Icon(
                     imageVector = Icons.Default.Language,
                     contentDescription = "Language",
-                    tint = Color(0xFF374151)
+                    tint = Color(0xFF374151),
+                    modifier = Modifier.size(22.dp)
                 )
             }
         }

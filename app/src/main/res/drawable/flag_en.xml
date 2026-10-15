@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- UK Flag (English) - circular clip -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+  <!-- Blue background -->
+  <path android:fillColor="#012169" android:pathData="M24,24m-24,0a24,24 0,1 1,48 0a24,24 0,1 1,-48 0"/>
+  <!-- White diagonals (St Andrew + St Patrick base) -->
+  <path android:fillColor="#FFFFFF" android:pathData="M0,16 L16,24 L0,32 Z"/>
+  <path android:fillColor="#FFFFFF" android:pathData="M48,16 L32,24 L48,32 Z"/>
+  <path android:fillColor="#FFFFFF" android:pathData="M16,0 L24,16 L32,0 Z"/>
+  <path android:fillColor="#FFFFFF" android:pathData="M16,48 L24,32 L32,48 Z"/>
+  <!-- Red diagonals St Patrick -->
+  <path android:fillColor="#C8102E" android:pathData="M0,18 L14,24 L0,30 Z"/>
+  <path android:fillColor="#C8102E" android:pathData="M48,18 L34,24 L48,30 Z"/>
+  <path android:fillColor="#C8102E" android:pathData="M18,0 L24,14 L30,0 Z"/>
+  <path android:fillColor="#C8102E" android:pathData="M18,48 L24,34 L30,48 Z"/>
+  <!-- White cross -->
+  <path android:fillColor="#FFFFFF" android:pathData="M0,20 L48,20 L48,28 L0,28 Z"/>
+  <path android:fillColor="#FFFFFF" android:pathData="M20,0 L28,0 L28,48 L20,48 Z"/>
+  <!-- Red cross -->
+  <path android:fillColor="#C8102E" android:pathData="M0,21.5 L48,21.5 L48,26.5 L0,26.5 Z"/>
+  <path android:fillColor="#C8102E" android:pathData="M21.5,0 L26.5,0 L26.5,48 L21.5,48 Z"/>
+</vector>

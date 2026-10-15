@@ -58,6 +58,7 @@ import com.pdf.alldocument.office.pdfreaderapp.presentation.tools.scantoexcel.Sc
 import com.pdf.alldocument.office.pdfreaderapp.presentation.tools.officetopdf.OfficeToPdfScreen
 import com.pdf.alldocument.office.pdfreaderapp.presentation.tools.wordtopdf.WordToPdfScreen
 import com.pdf.alldocument.office.pdfreaderapp.presentation.tools.pdftoword.PdfToWordScreen
+import com.pdf.alldocument.office.pdfreaderapp.presentation.aipaywall.AiPaywallScreen
 import com.pdf.alldocument.office.pdfreaderapp.presentation.viewer.office.OfficeViewerScreen
 import com.pdf.alldocument.office.pdfreaderapp.presentation.viewer.pdf.PdfViewerScreen
 
@@ -313,11 +314,12 @@ fun AppNavigation(navController: NavHostController) {
                     onNavigateToImageToText = { navController.navigate(Screen.ImageToText) },
                     onNavigateToIdCardScanner = { navController.navigate(Screen.IdCardScanner) },
                     onNavigateToIdPhotoMaker = { navController.navigate(Screen.IdPhotoMaker) },
-                    onNavigateToAiReading = { navController.navigate(Screen.AiReading) },
+                    onNavigateToAiReading = { navController.navigate(Screen.AiPaywall) },
                     onNavigateToScanToExcel = { navController.navigate(Screen.ScanToExcel) },
                     onNavigateToOfficeToPdf = { navController.navigate(Screen.OfficeToPdf) },
                     onNavigateToWordToPdf = { navController.navigate(Screen.WordToPdf) },
-                    onNavigateToPdfToWord = { navController.navigate(Screen.PdfToWord) }
+                    onNavigateToPdfToWord = { navController.navigate(Screen.PdfToWord) },
+                    onNavigateToCompress = { navController.navigate(Screen.CompressPdf) }
                 )
             }
 
@@ -339,6 +341,18 @@ fun AppNavigation(navController: NavHostController) {
 
             composable<Screen.IdPhotoMaker> {
                 IdPhotoScreen(onBack = { navController.popBackStack() })
+            }
+
+            composable<Screen.AiPaywall> {
+                AiPaywallScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateToAiReading = {
+                        navController.navigate(Screen.AiReading)
+                    },
+                    onNavigateToPrivacy = {
+                        navController.navigate(Screen.PrivacyPolicy())
+                    }
+                )
             }
 
             composable<Screen.AiReading> {

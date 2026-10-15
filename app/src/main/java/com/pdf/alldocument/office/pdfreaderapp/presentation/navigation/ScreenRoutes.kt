@@ -96,6 +96,9 @@ sealed interface Screen {
     data object AiReading : Screen
 
     @Serializable
+    data object AiPaywall : Screen
+
+    @Serializable
     data object ScanToExcel : Screen
 
     @Serializable

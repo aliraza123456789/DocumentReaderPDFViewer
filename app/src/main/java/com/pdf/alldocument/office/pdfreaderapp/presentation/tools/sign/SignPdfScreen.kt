@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -52,7 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.LottieLoadingIndicator
 import com.pdf.alldocument.office.pdfreaderapp.core.util.FileUtils
@@ -619,7 +620,7 @@ fun PdfSignEditorView(
 
                             // SIGNATURE OVERLAY (Screenshot 2)
                             if (state.signatureBitmap != null && previewSize.width > 0 && previewSize.height > 0) {
-                                val sigBmp = state.signatureBitmap!!
+                                val sigBmp = state.signatureBitmap
                                 val sigAspect = sigBmp.height.toFloat() / sigBmp.width.toFloat()
 
                                 val sigWidthPx = (previewSize.width * state.sigNormWidth).coerceAtLeast(60f)
@@ -699,7 +700,7 @@ fun PdfSignEditorView(
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Icon(
-                                            imageVector = Icons.Default.CompareArrows,
+                                            imageVector = Icons.AutoMirrored.Filled.CompareArrows,
                                             contentDescription = "Flip Signature",
                                             tint = Color.White,
                                             modifier = Modifier.size(17.dp)

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Italy Flag (Italian) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+  <path android:fillColor="#CE2B37" android:pathData="M24,24m-24,0a24,24 0,1 1,48 0a24,24 0,1 1,-48 0"/>
+  <!-- White stripe -->
+  <path android:fillColor="#FFFFFF" android:pathData="M16,0 L32,0 L32,48 L16,48 Z"/>
+  <!-- Green stripe -->
+  <path android:fillColor="#009246" android:pathData="M0,0 L16,0 L16,48 L0,48 Z"/>
+</vector>

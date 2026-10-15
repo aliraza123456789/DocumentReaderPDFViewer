@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,7 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pdf.alldocument.office.pdfreaderapp.R
 import kotlinx.coroutines.launch
 
@@ -124,7 +125,9 @@ fun IntroSlidesScreen(
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
                         .background(NavyDark)
-                        .padding(start = 28.dp, end = 28.dp, top = 28.dp, bottom = 28.dp)
+                        .padding(start = 28.dp, end = 28.dp, top = 28.dp)
+                        .navigationBarsPadding()
+                        .padding(bottom = 28.dp)
                 ) {
                     Column {
                         Text(
@@ -155,6 +158,7 @@ fun IntroSlidesScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
                 .padding(start = 28.dp, end = 28.dp, bottom = 28.dp)
         ) {
             Row(

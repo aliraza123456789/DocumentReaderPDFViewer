@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Turkey Flag (Turkish) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+  <path android:fillColor="#E30A17" android:pathData="M24,24m-24,0a24,24 0,1 1,48 0a24,24 0,1 1,-48 0"/>
+  <!-- White crescent -->
+  <path android:fillColor="#FFFFFF" android:pathData="M22,24m-9,0a9,9 0,1 1,18 0a9,9 0,1 1,-18 0"/>
+  <path android:fillColor="#E30A17" android:pathData="M24,24m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0"/>
+  <!-- White star (5-pointed simplified) -->
+  <path android:fillColor="#FFFFFF"
+      android:pathData="M30,24 L31.5,28.6 L35.4,26 L33,30.4 L38,30.4 L33.8,33 L35.4,37.6 L30,35 L24.6,37.6 L26.2,33 L22,30.4 L27,30.4 L24.6,26 L28.5,28.6 Z"
+      android:scaleX="0.45"
+      android:translateX="14"
+      android:translateY="-6"/>
+</vector>

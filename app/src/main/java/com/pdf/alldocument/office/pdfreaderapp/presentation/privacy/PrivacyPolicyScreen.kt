@@ -1,4 +1,4 @@
-package com.pdf.alldocument.office.pdfreaderapp.presentation.privacy
+﻿package com.pdf.alldocument.office.pdfreaderapp.presentation.privacy
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -66,7 +66,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.AppTopBar
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.BrandPurple
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.BrandPurpleDeep
