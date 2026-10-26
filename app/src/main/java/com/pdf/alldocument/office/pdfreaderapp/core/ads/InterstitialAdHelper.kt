@@ -2,6 +2,8 @@ package com.pdf.alldocument.office.pdfreaderapp.core.ads
 
 import android.app.Activity
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
 import com.google.android.libraries.ads.mobile.sdk.common.AdRequest
@@ -22,10 +24,23 @@ class InterstitialAdHelper @Inject constructor(
         private const val TAG = "InterstitialAdHelper"
     }
 
+    private val mainHandler = Handler(Looper.getMainLooper())
+
+    private fun runOnMainThread(block: () -> Unit) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            block()
+        } else {
+            mainHandler.post(block)
+        }
+    }
+
     private var interstitialAd: InterstitialAd? = null
     private var isAdLoading = false
     private var actionCounter = 0
     var isPremiumUser = false
+
+    private var onAdLoadedListener: ((InterstitialAd) -> Unit)? = null
+    private var onAdFailedListener: (() -> Unit)? = null
 
     fun loadAd(context: Context, adUnitId: String? = null) {
         if (interstitialAd != null || isAdLoading || isPremiumUser) return
@@ -33,22 +48,46 @@ class InterstitialAdHelper @Inject constructor(
         val targetId = adUnitId ?: AdMobManager.getInterstitialId(context)
         isAdLoading = true
         val adRequest = AdRequest.Builder(targetId).build()
-        InterstitialAd.load(
-            adRequest,
-            object : AdLoadCallback<InterstitialAd> {
-                override fun onAdLoaded(ad: InterstitialAd) {
-                    interstitialAd = ad
-                    isAdLoading = false
-                    Log.d(TAG, "GMA Next-Gen InterstitialAd loaded successfully.")
-                }
+        try {
+            InterstitialAd.load(
+                adRequest,
+                object : AdLoadCallback<InterstitialAd> {
+                    override fun onAdLoaded(ad: InterstitialAd) {
+                        runOnMainThread {
+                            interstitialAd = ad
+                            isAdLoading = false
+                            Log.d(TAG, "GMA Next-Gen InterstitialAd loaded successfully.")
+                            val listener = onAdLoadedListener
+                            onAdLoadedListener = null
+                            onAdFailedListener = null
+                            listener?.invoke(ad)
+                        }
+                    }
 
-                override fun onAdFailedToLoad(adError: LoadAdError) {
-                    interstitialAd = null
-                    isAdLoading = false
-                    Log.e(TAG, "GMA Next-Gen InterstitialAd failed to load: ${adError.message}")
+                    override fun onAdFailedToLoad(adError: LoadAdError) {
+                        runOnMainThread {
+                            interstitialAd = null
+                            isAdLoading = false
+                            Log.e(TAG, "GMA Next-Gen InterstitialAd failed to load: ${adError.message}")
+                            val listener = onAdFailedListener
+                            onAdLoadedListener = null
+                            onAdFailedListener = null
+                            listener?.invoke()
+                        }
+                    }
                 }
+            )
+        } catch (e: Exception) {
+            runOnMainThread {
+                interstitialAd = null
+                isAdLoading = false
+                Log.e(TAG, "Failed to call InterstitialAd.load", e)
+                val listener = onAdFailedListener
+                onAdLoadedListener = null
+                onAdFailedListener = null
+                listener?.invoke()
             }
-        )
+        }
     }
 
     /**
@@ -61,14 +100,18 @@ class InterstitialAdHelper @Inject constructor(
         frequencyEveryClicks: Int = 1,
         onAdDismissed: () -> Unit = {}
     ) {
+        val safeDismiss = {
+            runOnMainThread { onAdDismissed() }
+        }
+
         if (isPremiumUser || !AdMobManager.isAdEnabled(adKey)) {
-            activity.runOnUiThread { onAdDismissed() }
+            safeDismiss()
             return
         }
 
         actionCounter++
         if (actionCounter < frequencyEveryClicks) {
-            activity.runOnUiThread { onAdDismissed() }
+            safeDismiss()
             return
         }
         actionCounter = 0 // Reset counter
@@ -77,37 +120,102 @@ class InterstitialAdHelper @Inject constructor(
         if (ad != null) {
             ad.adEventCallback = object : InterstitialAdEventCallback {
                 override fun onAdDismissedFullScreenContent() {
-                    interstitialAd = null
-                    AdMobManager.isInterstitialShowing = false
-                    AppOpenAdHelper.isAlreadyShowingAd = false
-                    AppOpenAdHelper.lastInterstitialDismissedTime = System.currentTimeMillis()
-                    loadAd(activity)
-                    activity.runOnUiThread {
-                        onAdDismissed()
+                    runOnMainThread {
+                        interstitialAd = null
+                        AdMobManager.isInterstitialShowing = false
+                        AppOpenAdHelper.isAlreadyShowingAd = false
+                        AppOpenAdHelper.lastInterstitialDismissedTime = System.currentTimeMillis()
+                        loadAd(activity)
+                        safeDismiss()
                     }
                 }
 
                 override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
-                    interstitialAd = null
-                    AdMobManager.isInterstitialShowing = false
-                    AppOpenAdHelper.isAlreadyShowingAd = false
-                    AppOpenAdHelper.lastInterstitialDismissedTime = System.currentTimeMillis()
-                    loadAd(activity)
-                    activity.runOnUiThread {
-                        onAdDismissed()
+                    runOnMainThread {
+                        interstitialAd = null
+                        AdMobManager.isInterstitialShowing = false
+                        AppOpenAdHelper.isAlreadyShowingAd = false
+                        AppOpenAdHelper.lastInterstitialDismissedTime = System.currentTimeMillis()
+                        loadAd(activity)
+                        safeDismiss()
                     }
                 }
 
                 override fun onAdShowedFullScreenContent() {
-                    AdMobManager.isInterstitialShowing = true
-                    AppOpenAdHelper.isAlreadyShowingAd = true
-                    analyticsManager.logAdDisplay("interstitial", AdMobManager.getInterstitialId(activity))
+                    runOnMainThread {
+                        AdMobManager.isInterstitialShowing = true
+                        AppOpenAdHelper.isAlreadyShowingAd = true
+                        analyticsManager.logAdDisplay("interstitial", AdMobManager.getInterstitialId(activity))
+                    }
                 }
             }
-            ad.show(activity)
+            runOnMainThread {
+                ad.show(activity)
+            }
         } else {
             loadAd(activity)
-            activity.runOnUiThread { onAdDismissed() }
+            safeDismiss()
+        }
+    }
+
+    /**
+     * Dedicated method for Splash screen:
+     * If the ad is already loaded, shows immediately.
+     * If still loading, waits up to [maxWaitMs] (e.g. 2500ms) for the network response.
+     * As soon as loaded, shows immediately.
+     */
+    fun showSplashAd(
+        activity: Activity,
+        adKey: String = AdMobManager.KEY_SPLASH_INTER,
+        maxWaitMs: Long = 2500L,
+        onDismiss: () -> Unit
+    ) {
+        val safeDismiss = {
+            runOnMainThread { onDismiss() }
+        }
+
+        if (isPremiumUser || !AdMobManager.isAdEnabled(adKey)) {
+            safeDismiss()
+            return
+        }
+
+        if (interstitialAd != null) {
+            showAd(activity, adKey, frequencyEveryClicks = 1, onAdDismissed = onDismiss)
+            return
+        }
+
+        if (!isAdLoading) {
+            loadAd(activity)
+            safeDismiss()
+            return
+        }
+
+        var hasFinished = false
+        val timeoutRunnable = Runnable {
+            if (!hasFinished) {
+                hasFinished = true
+                onAdLoadedListener = null
+                onAdFailedListener = null
+                Log.d(TAG, "Splash ad wait timed out. Continuing navigation.")
+                safeDismiss()
+            }
+        }
+        mainHandler.postDelayed(timeoutRunnable, maxWaitMs)
+
+        onAdLoadedListener = {
+            if (!hasFinished) {
+                hasFinished = true
+                mainHandler.removeCallbacks(timeoutRunnable)
+                showAd(activity, adKey, frequencyEveryClicks = 1, onAdDismissed = onDismiss)
+            }
+        }
+
+        onAdFailedListener = {
+            if (!hasFinished) {
+                hasFinished = true
+                mainHandler.removeCallbacks(timeoutRunnable)
+                safeDismiss()
+            }
         }
     }
 }

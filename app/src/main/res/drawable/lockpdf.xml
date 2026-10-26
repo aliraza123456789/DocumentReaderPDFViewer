@@ -4,6 +4,7 @@
     android:height="48dp"
     android:viewportWidth="48"
     android:viewportHeight="48">
+  <!-- Document base with Secure Slate Charcoal gradient -->
   <path
       android:pathData="M12,4H30L38,12V40a4,4 0,0 1,-4 4H12a4,4 0,0 1,-4 -4V8a4,4 0,0 1,4 -4Z">
     <aapt:attr name="android:fillColor">
@@ -13,28 +14,44 @@
           android:endX="38"
           android:endY="44"
           android:type="linear">
-        <item android:offset="0" android:color="#FFFF6B6B"/>
-        <item android:offset="1" android:color="#FFE03131"/>
+        <item android:offset="0" android:color="#FF475569"/>
+        <item android:offset="1" android:color="#FF0F172A"/>
       </gradient>
     </aapt:attr>
   </path>
+  <!-- Fold corner -->
   <path
       android:pathData="M30,4L38,12H30Z"
       android:fillColor="#FFFFFF"
-      android:fillAlpha="0.4"/>
+      android:fillAlpha="0.3"/>
+  <!-- Lock Shackle (silver / white, locked closed into the body) -->
   <path
-      android:pathData="M18,22v-3a6,6 0,0 1,12 0v3"
-      android:strokeWidth="2.6"
+      android:pathData="M18.5,23v-4.5a5.5,5.5 0,0 1,11 0v4.5"
+      android:strokeWidth="2.8"
       android:fillColor="#00000000"
       android:strokeColor="#FFFFFF"
       android:strokeLineCap="round"/>
+  <!-- Lock Body (Warm Golden Yellow gradient for high visibility and security motif) -->
   <path
-      android:pathData="M18,22L30,22A3.5,3.5 0,0 1,33.5 25.5L33.5,31.5A3.5,3.5 0,0 1,30 35L18,35A3.5,3.5 0,0 1,14.5 31.5L14.5,25.5A3.5,3.5 0,0 1,18 22z"
-      android:fillColor="#FFFFFF"/>
+      android:pathData="M17,22.5L31,22.5A3.5,3.5 0,0 1,34.5 26L34.5,33A3.5,3.5 0,0 1,31 36.5L17,36.5A3.5,3.5 0,0 1,13.5 33L13.5,26A3.5,3.5 0,0 1,17 22.5z">
+    <aapt:attr name="android:fillColor">
+      <gradient
+          android:startX="14"
+          android:startY="22"
+          android:endX="34"
+          android:endY="37"
+          android:type="linear">
+        <item android:offset="0" android:color="#FFFBBF24"/>
+        <item android:offset="1" android:color="#FFF59E0B"/>
+      </gradient>
+    </aapt:attr>
+  </path>
+  <!-- Keyhole circular top -->
   <path
-      android:pathData="M24,27.5m-2.2,0a2.2,2.2 0,1 1,4.4 0a2.2,2.2 0,1 1,-4.4 0"
-      android:fillColor="#E03131"/>
+      android:pathData="M24,28.5m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
+      android:fillColor="#1E293B"/>
+  <!-- Keyhole slot -->
   <path
-      android:pathData="M23,28.5L25,28.5A1,1 0,0 1,26 29.5L26,31.5A1,1 0,0 1,25 32.5L23,32.5A1,1 0,0 1,22 31.5L22,29.5A1,1 0,0 1,23 28.5z"
-      android:fillColor="#E03131"/>
+      android:pathData="M23,29.5L25,29.5L25.4,33L22.6,33Z"
+      android:fillColor="#1E293B"/>
 </vector>

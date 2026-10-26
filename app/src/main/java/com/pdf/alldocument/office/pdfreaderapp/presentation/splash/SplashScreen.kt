@@ -1,5 +1,10 @@
 package com.pdf.alldocument.office.pdfreaderapp.presentation.splash
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,6 +33,15 @@ import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+private fun Context.findActivity(): Activity? {
+    var ctx = this
+    while (ctx is ContextWrapper) {
+        if (ctx is Activity) return ctx
+        ctx = ctx.baseContext
+    }
+    return null
+}
+
 @Composable
 fun SplashScreen(
     viewModel: SplashViewModel = hiltViewModel(),
@@ -38,31 +52,46 @@ fun SplashScreen(
 ) {
     val target by viewModel.navigationTarget.collectAsStateWithLifecycle()
     val context = androidx.compose.ui.platform.LocalContext.current
-    val activity = context as? android.app.Activity
+    val activity = remember(context) { context.findActivity() }
 
-    // Preload Interstitial ad early during splash animation
+    // Initialize and preload Interstitial ad early during splash animation
     LaunchedEffect(Unit) {
+        viewModel.adMobManager.initialize(context)
         viewModel.interstitialAdHelper.loadAd(context)
+        if (activity != null) {
+            viewModel.consentManager.gatherConsent(activity) { _ ->
+                viewModel.onConsentGathered()
+            }
+        } else {
+            viewModel.onConsentGathered()
+        }
     }
 
     LaunchedEffect(target) {
         val onNavigate: () -> Unit = {
-            when (target) {
-                is SplashNavigationTarget.Language -> onNavigateToLanguage()
-                is SplashNavigationTarget.PrivacyPolicy -> onNavigateToPrivacyPolicy()
-                is SplashNavigationTarget.Onboarding -> onNavigateToOnboarding()
-                is SplashNavigationTarget.Home -> onNavigateToHome()
-                else -> Unit
+            val performNavigation = {
+                when (target) {
+                    is SplashNavigationTarget.Language -> onNavigateToLanguage()
+                    is SplashNavigationTarget.PrivacyPolicy -> onNavigateToPrivacyPolicy()
+                    is SplashNavigationTarget.Onboarding -> onNavigateToOnboarding()
+                    is SplashNavigationTarget.Home -> onNavigateToHome()
+                    else -> Unit
+                }
+            }
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                performNavigation()
+            } else {
+                Handler(Looper.getMainLooper()).post(performNavigation)
             }
         }
 
         if (target !is SplashNavigationTarget.Loading) {
             if (activity != null) {
-                viewModel.interstitialAdHelper.showAd(
+                viewModel.interstitialAdHelper.showSplashAd(
                     activity = activity,
                     adKey = com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager.KEY_SPLASH_INTER,
-                    frequencyEveryClicks = 1,
-                    onAdDismissed = onNavigate
+                    maxWaitMs = 2500L,
+                    onDismiss = onNavigate
                 )
             } else {
                 onNavigate()

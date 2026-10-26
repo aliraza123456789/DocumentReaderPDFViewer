@@ -80,61 +80,38 @@ class AdMobManager @Inject constructor() {
             return value.equals("true", ignoreCase = true)
         }
 
-        @Volatile
-        private var preloadedNativeAd: com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd? = null
-        @Volatile
-        private var isNativeLoading: Boolean = false
+        // Native Ad preloading is completely disabled.
+        // Ads are requested and rendered on-demand in their respective activities/screens.
+        fun consumePreloadedNativeAd(): com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd? = null
+    }
 
-        fun preloadNativeAd(context: Context) {
-            if (!isAdEnabled(KEY_FILE_READER_NATIVE) || preloadedNativeAd != null || isNativeLoading) return
-            isNativeLoading = true
-            val targetId = getNativeId(context)
-            val request = com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdRequest.Builder(
-                targetId,
-                listOf(com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd.NativeAdType.NATIVE)
-            ).build()
-            com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdLoader.load(
-                request,
-                object : com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdLoaderCallback {
-                    override fun onNativeAdLoaded(nativeAd: com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd) {
-                        isNativeLoading = false
-                        preloadedNativeAd?.destroy()
-                        preloadedNativeAd = nativeAd
-                        Log.d(TAG, "Preloaded Native Ad ready")
-                    }
+    @Volatile
+    var isInitialized = false
+        private set
 
-                    override fun onAdFailedToLoad(adError: com.google.android.libraries.ads.mobile.sdk.common.LoadAdError) {
-                        isNativeLoading = false
-                        Log.w(TAG, "Failed to preload Native Ad: ${adError.message}")
+    fun initialize(context: Context, onComplete: (() -> Unit)? = null) {
+        if (isInitialized) {
+            onComplete?.invoke()
+            return
+        }
+        try {
+            val appId = getAppId(context)
+            val config = com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig.Builder(appId).build()
+            MobileAds.initialize(
+                context,
+                config,
+                object : com.google.android.libraries.ads.mobile.sdk.initialization.OnAdapterInitializationCompleteListener {
+                    override fun onAdapterInitializationComplete(status: com.google.android.libraries.ads.mobile.sdk.initialization.InitializationStatus) {
+                        isInitialized = true
+                        Log.d(TAG, "GMA Next-Gen MobileAds initialized successfully: $status")
+                        onComplete?.invoke()
                     }
                 }
             )
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to initialize Next-Gen MobileAds", e)
         }
-
-        fun consumePreloadedNativeAd(): com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd? {
-            val ad = preloadedNativeAd
-            preloadedNativeAd = null
-            return ad
-        }
-    }
-
-    private var isInitialized = false
-
-    fun initialize(context: Context) {
-        if (isInitialized) return
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val appId = getAppId(context)
-                val config = com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig.Builder(appId).build()
-                MobileAds.initialize(context, config)
-                isInitialized = true
-                Log.d(TAG, "GMA Next-Gen MobileAds initialized successfully with App ID: $appId")
-                preloadNativeAd(context)
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to initialize Next-Gen MobileAds", e)
-            }
-            fetchRemoteConfig()
-        }
+        fetchRemoteConfig()
     }
 
     private fun fetchRemoteConfig() {

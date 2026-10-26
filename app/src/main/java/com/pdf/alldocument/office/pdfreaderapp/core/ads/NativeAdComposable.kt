@@ -85,32 +85,37 @@ fun NativeAdCard(
 
     val context = LocalContext.current
     val targetId = adUnitId ?: AdMobManager.getNativeId(context)
-    var currentNativeAd by remember { mutableStateOf<NativeAd?>(AdMobManager.consumePreloadedNativeAd()) }
+    var currentNativeAd by remember { mutableStateOf<NativeAd?>(null) }
 
     DisposableEffect(targetId) {
-        if (currentNativeAd == null) {
-            val request = NativeAdRequest.Builder(
-                targetId,
-                listOf(com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd.NativeAdType.NATIVE)
-            ).build()
+        val request = NativeAdRequest.Builder(
+            targetId,
+            listOf(com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd.NativeAdType.NATIVE)
+        ).build()
+        try {
             NativeAdLoader.load(
                 request,
                 object : NativeAdLoaderCallback {
                     override fun onNativeAdLoaded(nativeAd: NativeAd) {
                         currentNativeAd?.destroy()
                         currentNativeAd = nativeAd
+                        android.util.Log.d("NativeAdCard", "Native ad loaded successfully on screen: headline=${nativeAd.headline}")
                     }
 
                     override fun onAdFailedToLoad(adError: LoadAdError) {
                         currentNativeAd = null
+                        android.util.Log.e("NativeAdCard", "Native ad failed to load: ${adError.message}")
                     }
                 }
             )
+        } catch (e: Exception) {
+            currentNativeAd = null
+            android.util.Log.e("NativeAdCard", "Failed to load NativeAd", e)
         }
 
         onDispose {
             currentNativeAd?.destroy()
-            AdMobManager.preloadNativeAd(context)
+            currentNativeAd = null
         }
     }
 

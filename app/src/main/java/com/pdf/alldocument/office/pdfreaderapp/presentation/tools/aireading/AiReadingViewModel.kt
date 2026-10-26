@@ -54,7 +54,8 @@ class AiReadingViewModel @Inject constructor(
 ) : ViewModel() {
 
     private companion object {
-        const val MODEL = "llama-3.3-70b-versatile"
+        const val PRIMARY_MODEL = "openai/gpt-oss-120b"
+        const val FALLBACK_MODEL = "openai/gpt-oss-20b"
         const val GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
         /** ~ 60k chars keeps us well inside the context window and bounds cost. */
         const val MAX_DOC_CHARS = 60_000
@@ -79,7 +80,7 @@ class AiReadingViewModel @Inject constructor(
     }
 
     fun loadDocument(uri: Uri, name: String) {
-        _uiState.update { AiReadingUiState(documentName = name, isExtracting = true) }
+        _uiState.update { it.copy(documentName = name, isExtracting = true, error = null) }
         viewModelScope.launch {
             try {
                 val full = withContext(Dispatchers.IO) { extractPdfText(uri) }
@@ -89,20 +90,16 @@ class AiReadingViewModel @Inject constructor(
                 }
                 val truncated = full.length > MAX_DOC_CHARS
                 val text = if (truncated) full.take(MAX_DOC_CHARS) else full
-                val apiKey = BuildConfig.GROQ_API_KEY
-                if (apiKey.isBlank()) {
-                    _uiState.update {
-                        it.copy(
-                            isExtracting = false,
-                            documentChars = full.length,
-                            truncated = truncated,
-                            error = "GROQ_API_KEY missing. Please add GROQ_API_KEY in local.properties"
-                        )
-                    }
-                    return@launch
-                }
                 documentText = text
-                _uiState.update { it.copy(isExtracting = false, documentChars = full.length, truncated = truncated, error = null) }
+                _uiState.update {
+                    it.copy(
+                        isExtracting = false,
+                        documentName = name,
+                        documentChars = full.length,
+                        truncated = truncated,
+                        error = null
+                    )
+                }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isExtracting = false, error = e.message ?: "Failed to read document") }
             }
@@ -116,22 +113,23 @@ class AiReadingViewModel @Inject constructor(
 
     fun runQuickAction(a: QuickAction) = send(a.prompt, displayText = a.label)
 
+    fun detachDocument() {
+        documentText = null
+        _uiState.update { it.copy(documentName = null, documentChars = 0, truncated = false) }
+    }
+
+    fun clearChat() {
+        stop()
+        _uiState.update { it.copy(messages = emptyList(), error = null) }
+    }
+
     fun send(prompt: String, displayText: String = prompt) {
-        val text = documentText
-        if (text == null) {
-            val key = BuildConfig.GROQ_API_KEY
-            if (key.isBlank()) {
-                _uiState.update { it.copy(error = "GROQ_API_KEY missing in local.properties") }
-            } else if (_uiState.value.documentName == null) {
-                _uiState.update { it.copy(error = "Please open a document first") }
-            }
-            return
-        }
-        if (prompt.isBlank() || _uiState.value.isResponding) return
+        val trimmedPrompt = prompt.trim()
+        if (trimmedPrompt.isBlank() || _uiState.value.isResponding) return
 
         val apiKey = BuildConfig.GROQ_API_KEY
         if (apiKey.isBlank()) {
-            _uiState.update { it.copy(error = "GROQ_API_KEY missing in local.properties") }
+            _uiState.update { it.copy(error = "GROQ_API_KEY missing. Please set GROQ_API_KEY in local.properties") }
             return
         }
 
@@ -147,111 +145,163 @@ class AiReadingViewModel @Inject constructor(
         }
 
         job = viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val jsonBody = JSONObject().apply {
-                    put("model", MODEL)
-                    put("temperature", 0.4)
-                    put("stream", true)
+            val executed = executeChatStream(
+                model = PRIMARY_MODEL,
+                apiKey = apiKey,
+                prompt = trimmedPrompt,
+                currentMessages = currentMessages,
+                aiId = aiId
+            )
 
-                    val messagesArr = JSONArray()
-                    messagesArr.put(JSONObject().apply {
-                        put("role", "system")
-                        put(
-                            "content",
-                            "You are an expert document reading assistant and study helper. Answer clearly, accurately, and helpfully using the document below. " +
-                            "If the answer is not in the document, say so politely. Reply in the user's language.\n\n" +
-                            "=== DOCUMENT START ===\n$text\n=== DOCUMENT END ==="
-                        )
-                    })
+            // If primary model failed, try fallback model
+            if (!executed) {
+                executeChatStream(
+                    model = FALLBACK_MODEL,
+                    apiKey = apiKey,
+                    prompt = trimmedPrompt,
+                    currentMessages = currentMessages,
+                    aiId = aiId
+                )
+            }
+        }
+    }
 
-                    // Retain up to the last 10 messages for conversation context
-                    val history = currentMessages.takeLast(10)
-                    for (m in history) {
-                        if (m.text.isNotBlank()) {
-                            messagesArr.put(JSONObject().apply {
-                                put("role", if (m.fromUser) "user" else "assistant")
-                                put("content", m.text)
-                            })
-                        }
+    private fun executeChatStream(
+        model: String,
+        apiKey: String,
+        prompt: String,
+        currentMessages: List<ChatMessage>,
+        aiId: Long
+    ): Boolean {
+        try {
+            val text = documentText
+            val systemContent = if (!text.isNullOrBlank()) {
+                "You are an expert document reading assistant and study helper. Answer clearly, accurately, and helpfully using the document below. " +
+                "If the answer is not in the document, say so politely. Reply in the user's language.\n\n" +
+                "=== DOCUMENT START ===\n$text\n=== DOCUMENT END ==="
+            } else {
+                "You are a helpful and knowledgeable AI assistant. Answer clearly, concisely, and helpfully in the user's language."
+            }
+
+            val jsonBody = JSONObject().apply {
+                put("model", model)
+                put("temperature", 0.4)
+                put("stream", true)
+
+                val messagesArr = JSONArray()
+                messagesArr.put(JSONObject().apply {
+                    put("role", "system")
+                    put("content", systemContent)
+                })
+
+                // Retain up to the last 8 messages for conversation history
+                val history = currentMessages.takeLast(8)
+                for (m in history) {
+                    if (m.text.isNotBlank()) {
+                        messagesArr.put(JSONObject().apply {
+                            put("role", if (m.fromUser) "user" else "assistant")
+                            put("content", m.text)
+                        })
                     }
-
-                    messagesArr.put(JSONObject().apply {
-                        put("role", "user")
-                        put("content", prompt)
-                    })
-
-                    put("messages", messagesArr)
                 }
 
-                val request = Request.Builder()
-                    .url(GROQ_URL)
-                    .addHeader("Authorization", "Bearer $apiKey")
-                    .addHeader("Content-Type", "application/json")
-                    .post(jsonBody.toString().toRequestBody("application/json; charset=utf-8".toMediaType()))
-                    .build()
+                messagesArr.put(JSONObject().apply {
+                    put("role", "user")
+                    put("content", prompt)
+                })
 
-                val call = httpClient.newCall(request)
-                activeCall = call
+                put("messages", messagesArr)
+            }
 
-                call.execute().use { response ->
-                    if (!response.isSuccessful) {
-                        val errString = response.body?.string().orEmpty()
-                        val errorMessage = try {
-                            val errObj = JSONObject(errString).optJSONObject("error")
-                            errObj?.optString("message") ?: "Groq API error (${response.code})"
-                        } catch (_: Exception) {
-                            "Groq API error: ${response.code} ${response.message}"
-                        }
-                        _uiState.update { it.copy(isResponding = false, error = errorMessage) }
-                        return@use
+            val request = Request.Builder()
+                .url(GROQ_URL)
+                .addHeader("Authorization", "Bearer $apiKey")
+                .addHeader("Content-Type", "application/json")
+                .post(jsonBody.toString().toRequestBody("application/json; charset=utf-8".toMediaType()))
+                .build()
+
+            val call = httpClient.newCall(request)
+            activeCall = call
+
+            call.execute().use { response ->
+                if (!response.isSuccessful) {
+                    val errString = response.body?.string().orEmpty()
+                    val errorMessage = try {
+                        val errObj = JSONObject(errString).optJSONObject("error")
+                        errObj?.optString("message") ?: "Groq API error (${response.code})"
+                    } catch (_: Exception) {
+                        "Groq API error: ${response.code} ${response.message}"
                     }
-
-                    val source = response.body?.source()
-                    if (source == null) {
-                        _uiState.update { it.copy(isResponding = false, error = "Empty response from server") }
-                        return@use
+                    // If 404 model not found, return false to try fallback
+                    if (response.code == 404 && model == PRIMARY_MODEL) {
+                        return false
                     }
+                    _uiState.update { it.copy(isResponding = false, error = errorMessage) }
+                    return true
+                }
 
-                    val sb = StringBuilder()
-                    while (!source.exhausted()) {
-                        val line = source.readUtf8Line() ?: break
-                        val trimmed = line.trim()
-                        if (trimmed.startsWith("data:")) {
-                            val data = trimmed.removePrefix("data:").trim()
-                            if (data == "[DONE]") break
-                            if (data.isNotEmpty()) {
-                                try {
-                                    val chunkObj = JSONObject(data)
-                                    val choices = chunkObj.optJSONArray("choices")
-                                    val delta = choices?.optJSONObject(0)?.optJSONObject("delta")
-                                    val content = delta?.optString("content")?.takeIf { it.isNotEmpty() }
-                                    if (!content.isNullOrEmpty()) {
-                                        sb.append(content)
-                                        val snapshot = sb.toString()
-                                        _uiState.update { s ->
-                                            s.copy(messages = s.messages.map { m ->
-                                                if (m.id == aiId) m.copy(text = snapshot) else m
-                                            })
-                                        }
+                val source = response.body?.source()
+                if (source == null) {
+                    _uiState.update { it.copy(isResponding = false, error = "Empty response from server") }
+                    return true
+                }
+
+                val sb = StringBuilder()
+                while (!source.exhausted()) {
+                    val line = source.readUtf8Line() ?: break
+                    val trimmed = line.trim()
+                    if (trimmed.startsWith("data:")) {
+                        val data = trimmed.removePrefix("data:").trim()
+                        if (data == "[DONE]") break
+                        if (data.isNotEmpty()) {
+                            try {
+                                val chunkObj = JSONObject(data)
+                                val choices = chunkObj.optJSONArray("choices")
+                                val delta = choices?.optJSONObject(0)?.optJSONObject("delta")
+                                val content = delta?.optString("content")?.takeIf { it.isNotEmpty() }
+                                if (!content.isNullOrEmpty()) {
+                                    sb.append(content)
+                                    val snapshot = sb.toString()
+                                    _uiState.update { s ->
+                                        s.copy(messages = s.messages.map { m ->
+                                            if (m.id == aiId) m.copy(text = snapshot) else m
+                                        })
                                     }
-                                } catch (_: Exception) {
-                                    // Ignore heartbeat or partial chunk json issues
                                 }
+                            } catch (_: Exception) {
+                                // Ignore heartbeat or unparseable chunks
                             }
                         }
                     }
-                    _uiState.update { it.copy(isResponding = false) }
                 }
-            } catch (e: Exception) {
-                if (e is CancellationException || activeCall?.isCanceled() == true) {
-                    _uiState.update { it.copy(isResponding = false) }
+
+                if (sb.isEmpty()) {
+                    _uiState.update { s ->
+                        s.copy(
+                            isResponding = false,
+                            messages = s.messages.filter { it.id != aiId },
+                            error = "No response generated. Please try again."
+                        )
+                    }
                 } else {
-                    _uiState.update { it.copy(isResponding = false, error = e.message ?: "AI request failed") }
+                    _uiState.update { it.copy(isResponding = false) }
                 }
-            } finally {
-                activeCall = null
+                return true
             }
+        } catch (e: Exception) {
+            if (e is CancellationException || activeCall?.isCanceled() == true) {
+                _uiState.update { it.copy(isResponding = false) }
+            } else {
+                _uiState.update { it.copy(isResponding = false, error = e.message ?: "AI request failed") }
+            }
+            return true
+        } finally {
+            activeCall = null
         }
+    }
+
+    fun clearError() {
+        _uiState.update { it.copy(error = null) }
     }
 
     fun stop() {

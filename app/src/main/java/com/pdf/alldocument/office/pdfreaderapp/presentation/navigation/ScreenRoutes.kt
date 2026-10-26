@@ -78,6 +78,9 @@ sealed interface Screen {
     data object CompressPdf : Screen
 
     @Serializable
+    data object EditPdf : Screen
+
+    @Serializable
     data object ImageToPdf : Screen
 
     @Serializable

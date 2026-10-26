@@ -1,4 +1,4 @@
-﻿package com.pdf.alldocument.office.pdfreaderapp.presentation.premium
+package com.pdf.alldocument.office.pdfreaderapp.presentation.premium
 
 import android.app.Activity
 import android.widget.Toast
@@ -33,6 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.android.billingclient.api.ProductDetails
+import com.pdf.alldocument.office.pdfreaderapp.core.billing.BillingManager
 import com.pdf.alldocument.office.pdfreaderapp.core.billing.PurchaseState
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.AccentGold
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.AppTopBar
@@ -54,12 +56,36 @@ fun PremiumScreen(
     // 3-second countdown timer for Onboarding close button
     var remainingSeconds by remember { mutableIntStateOf(if (isFromOnboarding) 3 else 0) }
 
+    // Preload Interstitial Ad early so it is ready when countdown finishes
+    LaunchedEffect(Unit) {
+        viewModel.interstitialAdHelper.loadAd(context)
+    }
+
     LaunchedEffect(isFromOnboarding) {
         if (isFromOnboarding) {
             while (remainingSeconds > 0) {
                 delay(1000L)
                 remainingSeconds--
             }
+        }
+    }
+
+    val onCloseWithAd = {
+        if (activity != null) {
+            viewModel.interstitialAdHelper.showAd(
+                activity = activity,
+                adKey = com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager.KEY_INTRO_INTER,
+                frequencyEveryClicks = 1,
+                onAdDismissed = onNavigateBack
+            )
+        } else {
+            onNavigateBack()
+        }
+    }
+
+    androidx.activity.compose.BackHandler(enabled = isFromOnboarding) {
+        if (remainingSeconds == 0) {
+            onCloseWithAd()
         }
     }
 
@@ -70,7 +96,7 @@ fun PremiumScreen(
         }
     }
 
-    val isPro = purchaseState is PurchaseState.Subscribed || purchaseState is PurchaseState.LifetimePro
+    val isPro = purchaseState is PurchaseState.Subscribed
 
     Scaffold(
         topBar = {
@@ -118,7 +144,7 @@ fun PremiumScreen(
                                 }
                             } else {
                                 IconButton(
-                                    onClick = onNavigateBack,
+                                    onClick = onCloseWithAd,
                                     modifier = Modifier
                                         .padding(end = 4.dp)
                                         .size(34.dp)
@@ -252,16 +278,42 @@ fun PremiumScreen(
                     }
                 }
             } else {
-                // Subscription options cards
-                val samplePlans = listOf(
-                    Triple("Weekly Access", "$1.99 / week", false),
-                    Triple("Yearly Best Value", "$19.99 / year (Save 80%)", true),
-                    Triple("Lifetime Pro", "$29.99 one-time payment", false)
+                // Dynamic subscription plans matched by Product ID
+                val weeklyProduct = products.find { it.productId == BillingManager.PRODUCT_WEEKLY }
+                val monthlyProduct = products.find { it.productId == BillingManager.PRODUCT_MONTHLY }
+                val yearlyProduct = products.find { it.productId == BillingManager.PRODUCT_YEARLY }
+
+                val weeklyPriceText = weeklyProduct?.let {
+                    val p = it.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()?.formattedPrice
+                    if (p != null) "$p / week" else null
+                } ?: "$1.99 / week"
+
+                val monthlyPriceText = monthlyProduct?.let {
+                    val p = it.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()?.formattedPrice
+                    if (p != null) "$p / month" else null
+                } ?: "$4.99 / month"
+
+                val yearlyPriceText = yearlyProduct?.let {
+                    val p = it.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()?.formattedPrice
+                    if (p != null) "$p / year (Save 80%)" else null
+                } ?: "$19.99 / year (Save 80%)"
+
+                data class UiPlan(
+                    val title: String,
+                    val priceText: String,
+                    val isBest: Boolean,
+                    val product: ProductDetails?
                 )
 
-                var selectedPlanIndex by remember { mutableIntStateOf(1) }
+                val plans = listOf(
+                    UiPlan("Weekly Access", weeklyPriceText, false, weeklyProduct),
+                    UiPlan("Monthly Access", monthlyPriceText, false, monthlyProduct),
+                    UiPlan("Yearly Best Value", yearlyPriceText, true, yearlyProduct)
+                )
 
-                samplePlans.forEachIndexed { index, plan ->
+                var selectedPlanIndex by remember { mutableIntStateOf(2) }
+
+                plans.forEachIndexed { index, plan ->
                     val isSelected = selectedPlanIndex == index
                     Card(
                         modifier = Modifier
@@ -287,11 +339,11 @@ fun PremiumScreen(
                             Column {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
-                                        text = plan.first,
+                                        text = plan.title,
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold
                                     )
-                                    if (plan.third) {
+                                    if (plan.isBest) {
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Box(
                                             modifier = Modifier
@@ -309,7 +361,7 @@ fun PremiumScreen(
                                     }
                                 }
                                 Text(
-                                    text = plan.second,
+                                    text = plan.priceText,
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -326,13 +378,14 @@ fun PremiumScreen(
 
                 Button(
                     onClick = {
-                        val product = products.getOrNull(selectedPlanIndex)
+                        val chosenPlan = plans.getOrNull(selectedPlanIndex)
+                        val product = chosenPlan?.product
                         if (product != null && activity != null) {
                             viewModel.buyProduct(activity, product)
                         } else {
                             Toast.makeText(
                                 context,
-                                "Google Play Store is connecting. Please try again shortly.",
+                                "Connecting to Google Play Store. If testing, please ensure you use an Internal Testing build.",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }

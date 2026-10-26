@@ -36,7 +36,6 @@ class BillingManager @Inject constructor(
         const val PRODUCT_WEEKLY = "weekly_sub"
         const val PRODUCT_MONTHLY = "monthly_sub"
         const val PRODUCT_YEARLY = "yearly_sub"
-        const val PRODUCT_LIFETIME = "lifetime_pro"
     }
 
     fun setFakePremium(isPremium: Boolean = true) {
@@ -64,7 +63,7 @@ class BillingManager @Inject constructor(
     }
 
     private fun queryProducts() {
-        val productList = listOf(
+        val subProducts = listOf(
             QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(PRODUCT_WEEKLY)
                 .setProductType(BillingClient.ProductType.SUBS)
@@ -76,20 +75,19 @@ class BillingManager @Inject constructor(
             QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(PRODUCT_YEARLY)
                 .setProductType(BillingClient.ProductType.SUBS)
-                .build(),
-            QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(PRODUCT_LIFETIME)
-                .setProductType(BillingClient.ProductType.INAPP)
                 .build()
         )
 
-        val params = QueryProductDetailsParams.newBuilder()
-            .setProductList(productList)
+        val subParams = QueryProductDetailsParams.newBuilder()
+            .setProductList(subProducts)
             .build()
 
-        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsResult ->
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                _productDetailsList.value = productDetailsResult.productDetailsList
+        billingClient.queryProductDetailsAsync(subParams) { subResult, subDetailsResult ->
+            if (subResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                _productDetailsList.value = subDetailsResult.productDetailsList
+            } else {
+                android.util.Log.e("BillingManager", "Error querying subscriptions: ${subResult.debugMessage} code: ${subResult.responseCode}")
+                _productDetailsList.value = emptyList()
             }
         }
     }
@@ -135,52 +133,29 @@ class BillingManager @Inject constructor(
                 }
             }
 
-            billingClient.queryPurchasesAsync(
-                QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build()
-            ) { inAppResult, inAppPurchases ->
-                if (inAppResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    val hasLifetime = inAppPurchases.any {
-                        it.products.contains(PRODUCT_LIFETIME) && it.purchaseState == Purchase.PurchaseState.PURCHASED
-                    }
-                    if (hasLifetime) {
-                        _purchaseState.value = PurchaseState.LifetimePro
-                        analyticsManager.setUserPremiumStatus(true)
-                        onResult?.invoke(true, "Lifetime Pro purchase restored successfully!")
-                        return@queryPurchasesAsync
-                    }
-                }
-                _purchaseState.value = PurchaseState.Free
-                analyticsManager.setUserPremiumStatus(false)
-                onResult?.invoke(false, "No active subscriptions or purchases found to restore.")
-            }
+            _purchaseState.value = PurchaseState.Free
+            analyticsManager.setUserPremiumStatus(false)
+            onResult?.invoke(false, "No active subscriptions found to restore.")
         }
     }
 
     fun launchPurchaseFlow(activity: Activity, productDetails: ProductDetails) {
         val pricingPhase = productDetails.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()
-        val priceMicros = pricingPhase?.priceAmountMicros ?: productDetails.oneTimePurchaseOfferDetails?.priceAmountMicros ?: 0L
-        val currencyCode = pricingPhase?.priceCurrencyCode ?: productDetails.oneTimePurchaseOfferDetails?.priceCurrencyCode ?: "USD"
+        val priceMicros = pricingPhase?.priceAmountMicros ?: 0L
+        val currencyCode = pricingPhase?.priceCurrencyCode ?: "USD"
         analyticsManager.logBeginCheckout(
             productId = productDetails.productId,
             priceMicros = priceMicros,
             currencyCode = currencyCode
         )
 
-        val productDetailsParamsList = if (productDetails.productType == BillingClient.ProductType.SUBS) {
-            val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken ?: return
-            listOf(
-                BillingFlowParams.ProductDetailsParams.newBuilder()
-                    .setProductDetails(productDetails)
-                    .setOfferToken(offerToken)
-                    .build()
-            )
-        } else {
-            listOf(
-                BillingFlowParams.ProductDetailsParams.newBuilder()
-                    .setProductDetails(productDetails)
-                    .build()
-            )
-        }
+        val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken ?: return
+        val productDetailsParamsList = listOf(
+            BillingFlowParams.ProductDetailsParams.newBuilder()
+                .setProductDetails(productDetails)
+                .setOfferToken(offerToken)
+                .build()
+        )
 
         val billingFlowParams = BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(productDetailsParamsList)

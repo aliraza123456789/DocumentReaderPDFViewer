@@ -37,7 +37,7 @@ val editFeatures = listOf(
     Feature("Edit Text", "Existing text modify", Icons.AutoMirrored.Filled.Article, Screen.EditText),
     Feature("Add Text", "Naya text add karo", Icons.Filled.Add, Screen.AddText),
     Feature("Annotate", "Draw, highlight, notes", Icons.Filled.Brush, Screen.Annotate),
-    Feature("Sign", "Digital signature", Icons.Filled.Draw, Screen.Sign)
+    Feature("Sign PDF", "Digital signature on PDF", Icons.Filled.Draw, Screen.Sign)
 )
 
 val manageFeatures = listOf(

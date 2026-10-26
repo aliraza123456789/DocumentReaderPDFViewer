@@ -60,7 +60,7 @@ class App : Application(), Configuration.Provider {
         // Observe Billing State to disable Ads for Pro users
         CoroutineScope(Dispatchers.Main).launch {
             billingManager.purchaseState.collect { state ->
-                val isPro = state is PurchaseState.Subscribed || state is PurchaseState.LifetimePro
+                val isPro = state is PurchaseState.Subscribed
                 appOpenAdHelper.isPremiumUser = isPro
                 interstitialAdHelper.isPremiumUser = isPro
             }

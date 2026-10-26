@@ -23,7 +23,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class PremiumViewModel @Inject constructor(
     private val billingManager: BillingManager,
-    private val analyticsManager: AnalyticsManager
+    private val analyticsManager: AnalyticsManager,
+    val interstitialAdHelper: com.pdf.alldocument.office.pdfreaderapp.core.ads.InterstitialAdHelper
 ) : ViewModel() {
 
     init {

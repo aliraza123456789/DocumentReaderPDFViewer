@@ -123,10 +123,11 @@ private fun ToolsCategoryTabs(
     val categories = remember {
         listOf(
             "All" to "✨ All",
-            "AI" to "🤖 AI Reading",
-            "Convert" to "🔄 Convert",
             "PDF Tools" to "📄 PDF Tools",
-            "Scan" to "📷 Scan"
+            "Sign" to "✍️ Sign PDF",
+            "Convert" to "🔄 Convert",
+            "Scan" to "📷 Scan",
+            "AI" to "🤖 AI Reading"
         )
     }
 
@@ -170,6 +171,7 @@ private data class GridToolItem(
     val title: String,
     @DrawableRes val iconRes: Int,
     val tintColor: Color = Color.Transparent,
+    val badge: String? = null,
     val onClick: () -> Unit
 )
 
@@ -196,6 +198,7 @@ fun ToolsHomeScreen(
     onNavigateToWordToPdf: () -> Unit = {},
     onNavigateToPdfToWord: () -> Unit = {},
     onNavigateToCompress: () -> Unit = {},
+    onNavigateToEditPdf: () -> Unit = {},
     onMenuClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -232,23 +235,24 @@ fun ToolsHomeScreen(
     // PDF Tools (Icons without background cards)
     val pdfTools = remember {
         listOf(
+            GridToolItem("Sign PDF", R.drawable.signpdf, badge = "NEW", onClick = { onNavigateToSign("", "Sign PDF") }),
             GridToolItem("Merge PDF", R.drawable.mergepdf, onClick = onNavigateToMerge),
             GridToolItem("Split PDF", R.drawable.splitpdf, onClick = onNavigateToSplitPdf),
-            GridToolItem("Sign PDF", R.drawable.signpdf, onClick = { onNavigateToSign("", "Sign PDF") }),
+            GridToolItem("Edit PDF", R.drawable.editpdf, onClick = onNavigateToEditPdf),
+            GridToolItem("Compress PDF", R.drawable.compresspdf, onClick = onNavigateToCompress),
             GridToolItem("Lock PDF", R.drawable.lockpdf, onClick = onNavigateToLockPdf),
             GridToolItem("Unlock PDF", R.drawable.unlockpdf, onClick = onNavigateToUnlockPdf),
-            GridToolItem("Change PDF\nPages Order", R.drawable.organizepdf, onClick = { onNavigateToOrganize("", "Change PDF Pages Order") }),
-            GridToolItem("Compress PDF", R.drawable.compresspdf, onClick = onNavigateToCompress)
+            GridToolItem("Change PDF\nPages Order", R.drawable.organizepdf, onClick = { onNavigateToOrganize("", "Change PDF Pages Order") })
         )
     }
 
     // Scan Tools (Circular soft tinted backgrounds)
     val scanTools = remember {
         listOf(
-            GridToolItem("ID Card", R.drawable.idcard, Color(0xFFE0F7FA), onNavigateToIdCardScanner),
-            GridToolItem("Extract Text", R.drawable.imagetotext, Color(0xFFF3E8FF), onNavigateToImageToText),
-            GridToolItem("ID Photo Maker", R.drawable.idphoto, Color(0xFFE0F2FE), onNavigateToIdPhotoMaker),
-            GridToolItem("Scan to Excel", R.drawable.scantoexcel, Color(0xFFE8F5E9), onNavigateToScanToExcel)
+            GridToolItem("ID Card", R.drawable.idcard, tintColor = Color(0xFFE0F7FA), onClick = onNavigateToIdCardScanner),
+            GridToolItem("Scan to PDF", R.drawable.scantopdf, tintColor = Color(0xFFFEE2E2), onClick = onNavigateToScanToPdf),
+            GridToolItem("ID Photo Maker", R.drawable.idphoto, tintColor = Color(0xFFE0F2FE), onClick = onNavigateToIdPhotoMaker),
+            GridToolItem("Scan to Excel", R.drawable.scantoexcel, tintColor = Color(0xFFE8F5E9), onClick = onNavigateToScanToExcel)
         )
     }
 
@@ -272,14 +276,13 @@ fun ToolsHomeScreen(
     }
 
     val onCategoryClick: (String) -> Unit = { category ->
-        coroutineScope.launch {
-            when (category) {
-                "All" -> scrollState.animateScrollTo(0)
-                "AI" -> scrollState.animateScrollTo(aiY.toInt().coerceAtLeast(0))
-                "Convert" -> scrollState.animateScrollTo((convertY.toInt() - 10).coerceAtLeast(0))
-                "PDF Tools" -> scrollState.animateScrollTo((pdfToolsY.toInt() - 10).coerceAtLeast(0))
-                "Scan" -> scrollState.animateScrollTo((scanY.toInt() - 10).coerceAtLeast(0))
-            }
+        when (category) {
+            "Sign" -> onNavigateToSign("", "Sign PDF")
+            "All" -> coroutineScope.launch { scrollState.animateScrollTo(0) }
+            "PDF Tools" -> coroutineScope.launch { scrollState.animateScrollTo((pdfToolsY.toInt() - 10).coerceAtLeast(0)) }
+            "Convert" -> coroutineScope.launch { scrollState.animateScrollTo((convertY.toInt() - 10).coerceAtLeast(0)) }
+            "Scan" -> coroutineScope.launch { scrollState.animateScrollTo((scanY.toInt() - 10).coerceAtLeast(0)) }
+            "AI" -> coroutineScope.launch { scrollState.animateScrollTo(aiY.toInt().coerceAtLeast(0)) }
         }
     }
 
@@ -291,18 +294,44 @@ fun ToolsHomeScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    Box(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = "PDF Tools",
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
-                            color = Color(0xFF0F172A),
-                            modifier = Modifier.align(Alignment.CenterStart)
+                            color = Color(0xFF0F172A)
                         )
+
+                        Surface(
+                            shape = RoundedCornerShape(20.dp),
+                            color = Color(0xFFE8F5E9),
+                            border = BorderStroke(1.dp, Color(0xFF10B981).copy(alpha = 0.4f)),
+                            modifier = Modifier.tactileClick { onNavigateToSign("", "Sign PDF") }
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.signpdf),
+                                    contentDescription = "Sign PDF",
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text(
+                                    text = "Sign PDF",
+                                    fontSize = 12.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF059669)
+                                )
+                            }
+                        }
                     }
 
                     // Horizontal quick-jump category pills
@@ -503,11 +532,29 @@ fun ToolsHomeScreen(
                                         horizontalAlignment = Alignment.CenterHorizontally,
                                         modifier = Modifier.padding(horizontal = 2.dp)
                                     ) {
-                                        Image(
-                                            painter = painterResource(id = tool.iconRes),
-                                            contentDescription = tool.title,
-                                            modifier = Modifier.size(42.dp)
-                                        )
+                                        Box(contentAlignment = Alignment.TopEnd) {
+                                            Image(
+                                                painter = painterResource(id = tool.iconRes),
+                                                contentDescription = tool.title,
+                                                modifier = Modifier.size(42.dp)
+                                            )
+                                            if (tool.badge != null) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .offset(x = 6.dp, y = (-4).dp)
+                                                        .clip(RoundedCornerShape(6.dp))
+                                                        .background(Color(0xFF10B981))
+                                                        .padding(horizontal = 4.dp, vertical = 1.dp)
+                                                ) {
+                                                    Text(
+                                                        text = tool.badge,
+                                                        color = Color.White,
+                                                        fontSize = 8.sp,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
+                                            }
+                                        }
                                         Spacer(modifier = Modifier.height(6.dp))
                                         Text(
                                             text = tool.title,

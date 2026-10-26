@@ -18,8 +18,8 @@ android {
         applicationId = "com.pdf.alldocument.office.pdfreaderapp"
         minSdk = 24
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.0.5"
+        versionCode = 6
+        versionName = "6.0.6"
 
         val props = Properties().apply {
             val f = rootProject.file("local.properties")
@@ -52,12 +52,19 @@ android {
         }
         debug {
             isMinifyEnabled = false
-            resValue("string", "app_Id", "\"ca-app-pub-3940256099942544~3347511713\"")
+            resValue("string", "app_Id", "\"ca-app-pub-3568615442442876~9923059144\"")
+            resValue("string", "banner_Id", "\"ca-app-pub-3568615442442876/7813337911\"")
+            resValue("string", "native_id", "\"ca-app-pub-3568615442442876/2716923906\"")
+            resValue("string", "interstitial_Id", "\"ca-app-pub-3568615442442876/5019653618\"")
+            resValue("string", "appopen_Id", "\"ca-app-pub-3568615442442876/5127464821\"")
+            resValue("string", "rewarded_interstitial_id", "\"ca-app-pub-3568615442442876/8743101192\"")
+
+           /* resValue("string", "app_Id", "\"ca-app-pub-3940256099942544~3347511713\"")
             resValue("string", "banner_Id", "\"ca-app-pub-3940256099942544/2014213617\"")
             resValue("string", "native_id", "\"ca-app-pub-3940256099942544/2247696110\"")
             resValue("string", "interstitial_Id", "\"ca-app-pub-3940256099942544/1033173712\"")
             resValue("string", "appopen_Id", "\"ca-app-pub-3940256099942544/9257395921\"")
-            resValue("string", "rewarded_interstitial_id", "\"ca-app-pub-3940256099942544/5354046379\"")
+            resValue("string", "rewarded_interstitial_id", "\"ca-app-pub-3940256099942544/5354046379\"")*/
         }
     }
     compileOptions {
@@ -137,8 +144,9 @@ dependencies {
     // OkHttp (Groq AI API Client)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
-    // Monetization & Play Services (GMA Next-Gen SDK)
+    // Monetization & Play Services (GMA Next-Gen SDK & UMP Consent)
     implementation(libs.ads.mobile.sdk)
+    implementation(libs.user.messaging.platform)
     implementation(libs.play.billing.ktx)
     implementation(libs.play.app.update.ktx)
 

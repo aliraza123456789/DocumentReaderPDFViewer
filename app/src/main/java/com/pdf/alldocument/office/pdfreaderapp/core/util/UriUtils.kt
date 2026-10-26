@@ -40,8 +40,10 @@ object UriUtils {
                 if (!exists()) mkdirs()
             }
             
-            // Ensure safe file name
-            val safeName = displayName.replace(Regex("[^a-zA-Z0-9._-]"), "_")
+            // Ensure safe and collision-proof file name
+            val uriHash = Math.abs(uri.toString().hashCode()).toString(16)
+            val sanitized = displayName.replace(Regex("[^a-zA-Z0-9._-]"), "_")
+            val safeName = "${uriHash}_$sanitized"
             val targetFile = File(cacheFolder, safeName)
 
             context.contentResolver.openInputStream(uri)?.use { inputStream ->

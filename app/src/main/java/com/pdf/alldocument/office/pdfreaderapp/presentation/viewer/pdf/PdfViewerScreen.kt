@@ -1,13 +1,12 @@
-﻿package com.pdf.alldocument.office.pdfreaderapp.presentation.viewer.pdf
+package com.pdf.alldocument.office.pdfreaderapp.presentation.viewer.pdf
 
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
-import android.graphics.Paint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
@@ -16,12 +15,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,11 +52,6 @@ fun PdfViewerScreen(
     }
 
     val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = lastReadPage.coerceAtLeast(0))
-
-    // Pinch-to-zoom state
-    var scale by remember { mutableFloatStateOf(1f) }
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    var offsetY by remember { mutableFloatStateOf(0f) }
 
     // Night mode color filter
     val nightModeTint = if (state.isNightMode) Color(0xFFD0D0D0) else Color.White
@@ -92,8 +88,10 @@ fun PdfViewerScreen(
                             contentDescription = "Night Mode"
                         )
                     }
-                    IconButton(onClick = { showJumpDialog = true }) {
-                        Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = "Jump to Page")
+                    if (state.totalPages > 1) {
+                        IconButton(onClick = { showJumpDialog = true }) {
+                            Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = "Jump to Page")
+                        }
                     }
                     IconButton(onClick = { ShareUtils.shareFile(context, filePath) }) {
                         Icon(Icons.Default.Share, contentDescription = "Share")
@@ -112,80 +110,66 @@ fun PdfViewerScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(if (state.isNightMode) Color(0xFF121212) else Color(0xFFF0F0F0))
+                .background(if (state.isNightMode) Color(0xFF121212) else Color(0xFFF2F4F7))
         ) {
-            if (state.isLoading && state.pages.isEmpty()) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            } else if (state.errorMessage != null && state.pages.isEmpty()) {
-                Text(
-                    text = state.errorMessage ?: "Failed to open document",
-                    modifier = Modifier.align(Alignment.Center).padding(24.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.error
-                )
-            } else {
-                LazyColumn(
-                    state = lazyListState,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .pointerInput(Unit) {
-                            detectTransformGestures { _, pan, zoom, _ ->
-                                scale = (scale * zoom).coerceIn(1.0f, 5.0f)
-                                if (scale > 1f) {
-                                    offsetX += pan.x
-                                    offsetY += pan.y
-                                } else {
-                                    offsetX = 0f
-                                    offsetY = 0f
-                                }
-                            }
-                        }
-                        .graphicsLayer {
-                            scaleX = scale
-                            scaleY = scale
-                            translationX = offsetX
-                            translationY = offsetY
+            when {
+                state.isLoading && state.pages.isEmpty() -> {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator(strokeWidth = 3.dp)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Loading document...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                state.errorMessage != null && state.pages.isEmpty() -> {
+                    ViewerErrorView(
+                        errorMessage = state.errorMessage ?: "Unable to open or read document",
+                        onRetry = { viewModel.retryLoading() },
+                        onUnlockPassword = {
+                            viewModel.unlockWithPassword("")
                         },
-                    contentPadding = PaddingValues(vertical = 8.dp, horizontal = 4.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    items(
-                        count = state.pages.size,
-                        key = { index -> "page_$index" }
-                    ) { index ->
-                        val page = state.pages.getOrNull(index)
-                        if (page != null && page.cachedFilePath.isNotEmpty()) {
-                            val imageFile = File(page.cachedFilePath)
-                            if (imageFile.exists()) {
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 4.dp),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                    colors = CardDefaults.cardColors(containerColor = nightModeTint)
-                                ) {
-                                    AsyncImage(
-                                        model = ImageRequest.Builder(context)
-                                            .data(imageFile)
-                                            .crossfade(true)
-                                            .build(),
-                                        contentDescription = "Page ${index + 1}",
-                                        modifier = Modifier.fillMaxWidth(),
-                                        contentScale = ContentScale.FillWidth
+                        onBack = onBack
+                    )
+                }
+                else -> {
+                    LazyColumn(
+                        state = lazyListState,
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(vertical = 12.dp, horizontal = 6.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(
+                            count = state.pages.size,
+                            key = { index -> "page_$index" }
+                        ) { index ->
+                            val page = state.pages.getOrNull(index)
+                            if (page != null && page.cachedFilePath.isNotEmpty()) {
+                                val imageFile = File(page.cachedFilePath)
+                                if (imageFile.exists()) {
+                                    ZoomablePageCard(
+                                        imageFile = imageFile,
+                                        index = index,
+                                        nightModeTint = nightModeTint
                                     )
+                                } else {
+                                    PagePlaceholder(index)
                                 }
                             } else {
                                 PagePlaceholder(index)
                             }
-                        } else {
-                            PagePlaceholder(index)
                         }
                     }
-                }
 
-                // Track current page based on scroll
-                LaunchedEffect(lazyListState.firstVisibleItemIndex) {
-                    viewModel.onPageChanged(lazyListState.firstVisibleItemIndex)
+                    // Track current page based on scroll
+                    LaunchedEffect(lazyListState.firstVisibleItemIndex) {
+                        viewModel.onPageChanged(lazyListState.firstVisibleItemIndex)
+                    }
                 }
             }
         }
@@ -219,6 +203,135 @@ fun PdfViewerScreen(
 }
 
 @Composable
+private fun ZoomablePageCard(
+    imageFile: File,
+    index: Int,
+    nightModeTint: Color
+) {
+    val context = LocalContext.current
+    var pageScale by remember { mutableFloatStateOf(1f) }
+    var pageOffsetX by remember { mutableFloatStateOf(0f) }
+    var pageOffsetY by remember { mutableFloatStateOf(0f) }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = nightModeTint),
+        shape = RoundedCornerShape(4.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clipToBounds()
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onDoubleTap = {
+                            if (pageScale > 1.2f) {
+                                pageScale = 1f
+                                pageOffsetX = 0f
+                                pageOffsetY = 0f
+                            } else {
+                                pageScale = 2.2f
+                            }
+                        }
+                    )
+                }
+                .pointerInput(Unit) {
+                    detectTransformGestures { _, pan, zoom, _ ->
+                        val newScale = (pageScale * zoom).coerceIn(1.0f, 4.0f)
+                        pageScale = newScale
+                        if (newScale > 1.05f) {
+                            pageOffsetX += pan.x
+                            pageOffsetY += pan.y
+                        } else {
+                            pageOffsetX = 0f
+                            pageOffsetY = 0f
+                        }
+                    }
+                }
+        ) {
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(imageFile)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Page ${index + 1}",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .graphicsLayer {
+                        scaleX = pageScale
+                        scaleY = pageScale
+                        translationX = pageOffsetX
+                        translationY = pageOffsetY
+                    },
+                contentScale = ContentScale.FillWidth
+            )
+        }
+    }
+}
+
+@Composable
+private fun ViewerErrorView(
+    errorMessage: String,
+    onRetry: () -> Unit,
+    onUnlockPassword: () -> Unit,
+    onBack: () -> Unit
+) {
+    val isPasswordLikely = errorMessage.contains("password", ignoreCase = true) ||
+            errorMessage.contains("encrypt", ignoreCase = true)
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(28.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = if (isPasswordLikely) Icons.Default.Lock else Icons.Default.ErrorOutline,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.error,
+            modifier = Modifier.size(56.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = if (isPasswordLikely) "Password Required" else "Unable to Open Document",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = errorMessage,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            OutlinedButton(onClick = onBack) {
+                Text("Go Back")
+            }
+            if (isPasswordLikely) {
+                Button(onClick = onUnlockPassword) {
+                    Text("Enter Password")
+                }
+            } else {
+                Button(onClick = onRetry) {
+                    Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Try Again")
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun EnterViewerPasswordDialog(
     errorMessage: String?,
     onDismiss: () -> Unit,
@@ -247,7 +360,7 @@ private fun EnterViewerPasswordDialog(
         text = {
             Column {
                 Text(
-                    text = "This PDF document is encrypted. Enter password to view its contents.",
+                    text = "This PDF document is encrypted. Enter the password to view its contents.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

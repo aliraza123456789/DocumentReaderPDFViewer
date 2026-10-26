@@ -11,18 +11,6 @@
         android:layout_height="wrap_content"
         android:padding="14dp">
 
-        <!-- Top Right Disclosure Tag -->
-        <TextView
-            android:id="@+id/ad_notification_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="AD"
-            android:textColor="#6B6B7A"
-            android:textSize="10sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <!-- App / Advertiser Icon on Left -->
         <androidx.cardview.widget.CardView
             android:id="@+id/card_icon"
@@ -66,7 +54,7 @@
                 android:paddingEnd="6dp"
                 android:paddingBottom="1dp"
                 android:text="AD"
-                android:textColor="#5B4FE0"
+                android:textColor="#16A34A"
                 android:textSize="10sp"
                 android:textStyle="bold" />
 
@@ -96,19 +84,20 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_cta"
             android:layout_width="wrap_content"
-            android:layout_height="38dp"
-            android:minWidth="80dp"
+            android:layout_height="36dp"
+            android:minWidth="76dp"
             android:background="@drawable/bg_native_ad_cta"
             app:backgroundTint="@null"
-            android:drawableEnd="@drawable/ic_ad_arrow_forward"
-            android:drawablePadding="4dp"
             android:paddingStart="14dp"
-            android:paddingEnd="12dp"
+            android:paddingEnd="14dp"
             android:text="Install"
             android:textColor="@android:color/white"
             android:textSize="13sp"
             android:textStyle="bold"
             android:textAllCaps="false"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />

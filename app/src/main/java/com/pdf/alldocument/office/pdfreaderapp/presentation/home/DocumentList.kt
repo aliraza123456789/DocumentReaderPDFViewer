@@ -48,7 +48,7 @@ private fun tabAccentColor(tab: DocumentType): Color = when (tab.title.lowercase
     "excel" -> ColorExcel
     "ppt" -> ColorPpt
     "text", "txt" -> ColorTxt
-    else -> BrandPurple
+    else -> Color(0xFF34C759)
 }
 
 /**
@@ -85,7 +85,7 @@ fun DocumentTabs(
                             brush = if (isSelected) {
                                 val accent = tabAccentColor(tab)
                                 if (tab.title.equals("all", ignoreCase = true)) {
-                                    Brush.horizontalGradient(listOf(BrandPurple, BrandPurpleEnd))
+                                    SolidColor(Color(0xFF34C759))
                                 } else {
                                     SolidColor(accent)
                                 }
@@ -139,7 +139,6 @@ fun DocumentList(
         onDispose {
             feedAdsMap.values.forEach { it.destroy() }
             feedAdsMap.clear()
-            AdMobManager.preloadNativeAd(context)
         }
     }
 
@@ -490,28 +489,27 @@ fun FeedNativeAdItem(
     LaunchedEffect(slotIndex) {
         if (!adsMap.containsKey(slotIndex) && !loadAttempted) {
             loadAttempted = true
-            val preloaded = AdMobManager.consumePreloadedNativeAd()
-            if (preloaded != null) {
-                adsMap[slotIndex] = preloaded
-                AdMobManager.preloadNativeAd(context)
-            } else {
-                val targetId = AdMobManager.getNativeId(context)
-                val request = NativeAdRequest.Builder(
-                    targetId,
-                    listOf(NativeAd.NativeAdType.NATIVE)
-                ).build()
+            val targetId = AdMobManager.getNativeId(context)
+            val request = NativeAdRequest.Builder(
+                targetId,
+                listOf(NativeAd.NativeAdType.NATIVE)
+            ).build()
+            try {
                 NativeAdLoader.load(
                     request,
                     object : NativeAdLoaderCallback {
                         override fun onNativeAdLoaded(nativeAd: NativeAd) {
                             adsMap[slotIndex] = nativeAd
+                            android.util.Log.d("FeedNativeAd", "Feed Native Ad loaded directly: ${nativeAd.headline}")
                         }
 
                         override fun onAdFailedToLoad(adError: com.google.android.libraries.ads.mobile.sdk.common.LoadAdError) {
-                            android.util.Log.w("FeedNativeAd", "Ad failed to load: ${adError.message}")
+                            android.util.Log.e("FeedNativeAd", "Feed Native Ad failed to load: ${adError.message}")
                         }
                     }
                 )
+            } catch (e: Exception) {
+                android.util.Log.e("FeedNativeAd", "Failed to load Feed Native Ad", e)
             }
         }
     }
@@ -541,10 +539,10 @@ fun AdBannerCard(
     // light and dark app themes, so every color here is hardcoded instead of
     // pulled from MaterialTheme (that's what was making the text invisible
     // in dark mode: it was inheriting the theme's light-on-dark content color).
-    val adCardBg = Color(0xFFEFF1FE)
+    val adCardBg = Color(0xFFF0FDF4)
     val adHeadlineColor = Color(0xFF1B1B24)
     val adBodyColor = Color(0xFF6B6B7A)
-    val adTagColor = Color(0xFF5B4FE0)
+    val adTagColor = Color(0xFF16A34A)
 
     Card(
         modifier = modifier
@@ -555,15 +553,6 @@ fun AdBannerCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box(modifier = Modifier.fillMaxWidth().padding(14.dp)) {
-            // Small "AD" disclosure tag, top-right of the card.
-            Text(
-                text = "AD",
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold,
-                color = adBodyColor,
-                modifier = Modifier.align(Alignment.TopEnd)
-            )
-
             Row(verticalAlignment = Alignment.CenterVertically) {
                 FourSquareGlyph()
                 Spacer(modifier = Modifier.width(12.dp))
@@ -575,7 +564,7 @@ fun AdBannerCard(
                         color = adTagColor,
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
-                            .background(Color.White.copy(alpha = 0.7f))
+                            .background(Color(0xFFDCFCE7))
                             .padding(horizontal = 6.dp, vertical = 1.dp)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
@@ -600,25 +589,16 @@ fun AdBannerCard(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
-                        .background(Brush.horizontalGradient(listOf(BrandPurple, BrandPurpleEnd)))
+                        .background(SolidColor(Color(0xFF34C759)))
                         .clickable(onClick = onSignUpClick)
                         .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "Sign up",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = Color.White
-                        )
-                    }
+                    Text(
+                        text = "Sign up",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
                 }
             }
         }
@@ -680,7 +660,7 @@ fun ScrollToTopButton(
             Icon(
                 imageVector = Icons.Default.KeyboardDoubleArrowUp,
                 contentDescription = "Scroll to top",
-                tint = BrandPurple,
+                tint = Color(0xFF34C759),
                 modifier = Modifier.size(24.dp)
             )
         }

@@ -8,14 +8,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp">
+        android:padding="8dp">
 
         <!-- Left Media View (Image / Video) -->
         <androidx.cardview.widget.CardView
             android:id="@+id/card_media"
-            android:layout_width="145dp"
-            android:layout_height="105dp"
-            app:cardCornerRadius="10dp"
+            android:layout_width="115dp"
+            android:layout_height="90dp"
+            app:cardCornerRadius="8dp"
             app:cardElevation="0dp"
             app:cardBackgroundColor="#F1F5F9"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -33,7 +33,7 @@
             android:id="@+id/ll_ad_row"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="10dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
@@ -46,20 +46,20 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_ad_badge"
                 android:gravity="center"
-                android:paddingStart="5dp"
-                android:paddingTop="2dp"
-                android:paddingEnd="5dp"
-                android:paddingBottom="2dp"
+                android:paddingStart="4dp"
+                android:paddingTop="1dp"
+                android:paddingEnd="4dp"
+                android:paddingBottom="1dp"
                 android:text="AD"
                 android:textColor="@android:color/white"
-                android:textSize="10sp"
+                android:textSize="9sp"
                 android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/iv_icon"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_marginStart="8dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginStart="6dp"
                 android:visibility="gone"
                 android:contentDescription="@null" />
         </LinearLayout>
@@ -69,12 +69,12 @@
             android:id="@+id/tv_primary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="2dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="#111827"
-            android:textSize="15sp"
+            android:textSize="13sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/card_media"
@@ -85,38 +85,29 @@
             android:id="@+id/tv_secondary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="2dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="1dp"
             android:ellipsize="end"
             android:maxLines="2"
             android:textColor="#6B7280"
-            android:textSize="12sp"
+            android:textSize="11sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/card_media"
             app:layout_constraintTop_toBottomOf="@+id/tv_primary" />
-
-        <!-- Hidden body view reference if needed -->
-        <TextView
-            android:id="@+id/tv_body"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Green Rounded Call to Action (CTA) Button -->
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_cta"
             android:layout_width="0dp"
-            android:layout_height="38dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="6dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="4dp"
             android:background="@drawable/bg_cta_green"
             android:gravity="center"
             android:text="Sign Up"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="14sp"
+            android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/card_media"
             app:layout_constraintEnd_toEndOf="parent"

@@ -1,4 +1,4 @@
-﻿package com.pdf.alldocument.office.pdfreaderapp.presentation.privacy
+package com.pdf.alldocument.office.pdfreaderapp.presentation.privacy
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -71,6 +71,8 @@ import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.AppTopBar
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.BrandPurple
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.BrandPurpleDeep
 import com.pdf.alldocument.office.pdfreaderapp.core.designsystem.BrandPurpleEnd
+
+private val PrivacyAccentGreen = Color(0xFF34C759)
 
 private data class PrivacyHighlight(
     val icon: ImageVector,
@@ -198,7 +200,7 @@ fun PrivacyPolicyScreen(
                                 checked = isAgreed,
                                 onCheckedChange = { isAgreed = it },
                                 colors = CheckboxDefaults.colors(
-                                    checkedColor = BrandPurpleDeep,
+                                    checkedColor = PrivacyAccentGreen,
                                     checkmarkColor = Color.White
                                 )
                             )
@@ -271,17 +273,14 @@ fun PrivacyPolicyScreen(
                         modifier = Modifier
                             .size(72.dp)
                             .clip(CircleShape)
-                            .background(
-                                Brush.linearGradient(
-                                    colors = listOf(BrandPurple, BrandPurpleEnd)
-                                )
-                            ),
+                            .background(PrivacyAccentGreen.copy(alpha = 0.14f))
+                            .border(1.5.dp, PrivacyAccentGreen.copy(alpha = 0.35f), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Security,
                             contentDescription = "Privacy Shield",
-                            tint = Color.White,
+                            tint = PrivacyAccentGreen,
                             modifier = Modifier.size(38.dp)
                         )
                     }
@@ -300,7 +299,7 @@ fun PrivacyPolicyScreen(
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = null,
-                                tint = Color(0xFF16A34A),
+                                tint = PrivacyAccentGreen,
                                 modifier = Modifier.size(14.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
@@ -403,7 +402,7 @@ fun PrivacyPolicyScreen(
                         Icon(
                             imageVector = Icons.Default.Info,
                             contentDescription = null,
-                            tint = BrandPurpleDeep,
+                            tint = PrivacyAccentGreen,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
@@ -456,13 +455,13 @@ private fun PrivacyHighlightCard(
                 modifier = Modifier
                     .size(36.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(BrandPurple.copy(alpha = 0.12f)),
+                    .background(PrivacyAccentGreen.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = highlight.icon,
                     contentDescription = null,
-                    tint = BrandPurpleDeep,
+                    tint = PrivacyAccentGreen,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -511,13 +510,13 @@ private fun PolicyAccordionCard(
                     modifier = Modifier
                         .size(34.dp)
                         .clip(CircleShape)
-                        .background(BrandPurpleDeep.copy(alpha = 0.08f)),
+                        .background(PrivacyAccentGreen.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = section.icon,
                         contentDescription = null,
-                        tint = BrandPurpleDeep,
+                        tint = PrivacyAccentGreen,
                         modifier = Modifier.size(18.dp)
                     )
                 }

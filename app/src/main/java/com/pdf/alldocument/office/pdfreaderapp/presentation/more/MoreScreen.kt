@@ -62,50 +62,81 @@ fun MoreScreen(
     onNavigateToLanguage: () -> Unit,
     onNavigateToPrivacyPolicy: () -> Unit
 ) {
-    val options = listOf(
-        MoreOption(
-            title = "File Manager",
-            description = "Browse, filter and sort all your documents",
-            icon = Icons.Filled.FolderOpen,
-            iconColor = PrimaryRed,
-            onClick = onNavigateToFileManager
-        ),
-        MoreOption(
-            title = "PDF Tools",
-            description = "Merge, sign, organize and manage PDF files",
-            icon = Icons.Filled.Build,
-            iconColor = PrimaryRed,
-            onClick = onNavigateToTools
-        ),
-        MoreOption(
-            title = "Search Documents",
-            description = "Find any PDF or office document on your device",
-            icon = Icons.Filled.Search,
-            iconColor = ColorAll,
-            onClick = onNavigateToSearch
-        ),
-        MoreOption(
-            title = "Premium",
-            description = "Remove ads and unlock all document tools",
-            icon = Icons.Filled.WorkspacePremium,
-            iconColor = AccentGold,
-            onClick = onNavigateToPremium
-        ),
-        MoreOption(
-            title = "Language",
-            description = "Change the app display language",
-            icon = Icons.Filled.Language,
-            iconColor = SecondaryTeal,
-            onClick = onNavigateToLanguage
-        ),
-        MoreOption(
-            title = "Privacy Policy",
-            description = "Learn how your documents remain 100% private and local",
-            icon = Icons.Filled.Security,
-            iconColor = BrandPurpleDeep,
-            onClick = onNavigateToPrivacyPolicy
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val activity = context as? android.app.Activity
+    val consentManager = androidx.compose.runtime.remember {
+        com.pdf.alldocument.office.pdfreaderapp.core.ads.GoogleMobileAdsConsentManager.getInstance(context)
+    }
+
+    val options = buildList {
+        add(
+            MoreOption(
+                title = "File Manager",
+                description = "Browse, filter and sort all your documents",
+                icon = Icons.Filled.FolderOpen,
+                iconColor = PrimaryRed,
+                onClick = onNavigateToFileManager
+            )
         )
-    )
+        add(
+            MoreOption(
+                title = "PDF Tools",
+                description = "Merge, sign, organize and manage PDF files",
+                icon = Icons.Filled.Build,
+                iconColor = PrimaryRed,
+                onClick = onNavigateToTools
+            )
+        )
+        add(
+            MoreOption(
+                title = "Search Documents",
+                description = "Find any PDF or office document on your device",
+                icon = Icons.Filled.Search,
+                iconColor = ColorAll,
+                onClick = onNavigateToSearch
+            )
+        )
+        add(
+            MoreOption(
+                title = "Premium",
+                description = "Remove ads and unlock all document tools",
+                icon = Icons.Filled.WorkspacePremium,
+                iconColor = AccentGold,
+                onClick = onNavigateToPremium
+            )
+        )
+        add(
+            MoreOption(
+                title = "Language",
+                description = "Change the app display language",
+                icon = Icons.Filled.Language,
+                iconColor = SecondaryTeal,
+                onClick = onNavigateToLanguage
+            )
+        )
+        add(
+            MoreOption(
+                title = "Privacy Policy",
+                description = "Learn how your documents remain 100% private and local",
+                icon = Icons.Filled.Security,
+                iconColor = BrandPurpleDeep,
+                onClick = onNavigateToPrivacyPolicy
+            )
+        )
+        if (consentManager.isPrivacyOptionsRequired && activity != null) {
+            add(
+                MoreOption(
+                    title = "Ad Privacy Settings",
+                    description = "Manage your advertising and tracking consent choices",
+                    icon = Icons.Filled.Security,
+                    iconColor = SecondaryTeal,
+                    onClick = {
+                        consentManager.showPrivacyOptionsForm(activity) { _ -> }
+                    }
+                )
+            )
+        }
+    }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),

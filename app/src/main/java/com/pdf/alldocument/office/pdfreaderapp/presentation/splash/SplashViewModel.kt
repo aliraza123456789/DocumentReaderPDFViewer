@@ -2,8 +2,12 @@ package com.pdf.alldocument.office.pdfreaderapp.presentation.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pdf.alldocument.office.pdfreaderapp.core.ads.AdMobManager
+import com.pdf.alldocument.office.pdfreaderapp.core.ads.GoogleMobileAdsConsentManager
+import com.pdf.alldocument.office.pdfreaderapp.core.ads.InterstitialAdHelper
 import com.pdf.alldocument.office.pdfreaderapp.domain.repository.UserPrefsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,19 +26,38 @@ sealed interface SplashNavigationTarget {
 @HiltViewModel
 class SplashViewModel @Inject constructor(
     private val userPrefsRepository: UserPrefsRepository,
-    val interstitialAdHelper: com.pdf.alldocument.office.pdfreaderapp.core.ads.InterstitialAdHelper
+    val interstitialAdHelper: InterstitialAdHelper,
+    val adMobManager: AdMobManager,
+    val consentManager: GoogleMobileAdsConsentManager
 ) : ViewModel() {
 
     private val _navigationTarget = MutableStateFlow<SplashNavigationTarget>(SplashNavigationTarget.Loading)
     val navigationTarget: StateFlow<SplashNavigationTarget> = _navigationTarget.asStateFlow()
 
+    private var isAnimationTimerFinished = false
+    private var isConsentFinished = false
+
     init {
-        determineDestination()
+        startSplashTimer()
     }
 
-    private fun determineDestination() {
+    private fun startSplashTimer() {
         viewModelScope.launch {
-            kotlinx.coroutines.delay(2200) // Wait for splash animations to complete (progress: 150ms + 1900ms = 2050ms)
+            delay(2200) // Wait for splash entrance and progress animation (progress: 150ms + 1900ms = 2050ms)
+            isAnimationTimerFinished = true
+            checkReadyToNavigate()
+        }
+    }
+
+    fun onConsentGathered() {
+        isConsentFinished = true
+        checkReadyToNavigate()
+    }
+
+    private fun checkReadyToNavigate() {
+        if (!isAnimationTimerFinished || !isConsentFinished) return
+
+        viewModelScope.launch {
             val isLanguageSelected = userPrefsRepository.isLanguageSelected.first()
             val isPrivacyAccepted = userPrefsRepository.isPrivacyPolicyAccepted.first()
             val isOnboardingCompleted = userPrefsRepository.isOnboardingCompleted.first()

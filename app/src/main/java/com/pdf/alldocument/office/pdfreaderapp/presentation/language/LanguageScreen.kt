@@ -9,9 +9,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,7 +44,8 @@ fun LanguageScreen(
     val context = LocalContext.current
     val activity = context as? android.app.Activity
     val savedCode by viewModel.selectedLanguageCode.collectAsStateWithLifecycle()
-    var selectedCode by remember(savedCode) { mutableStateOf(savedCode) }
+    var userSelectedCode by rememberSaveable { mutableStateOf<String?>(null) }
+    val selectedCode = userSelectedCode ?: savedCode
 
     // Preload Interstitial ad
     LaunchedEffect(Unit) {
@@ -59,6 +61,7 @@ fun LanguageScreen(
             val proceedNext = {
                 scope.launch {
                     viewModel.saveLanguageSuspend(selectedCode)
+                    LanguageManager.setAppLocale(context, selectedCode)
                     onLanguageSelected()
                 }
             }
@@ -95,12 +98,29 @@ fun LanguageScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = "Languages",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1A1A1A)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (!isFirstLaunch && onBack != null) {
+                            IconButton(
+                                onClick = onBack,
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Back",
+                                    tint = Color(0xFF1A1A1A)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(4.dp))
+                        }
+                        Text(
+                            text = "Languages",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1A1A1A)
+                        )
+                    }
 
                     // Green "Done" pill button
                     Button(
@@ -155,10 +175,7 @@ fun LanguageScreen(
                     language = language,
                     isSelected = language.code == selectedCode,
                     onClick = {
-                        if (selectedCode != language.code) {
-                            selectedCode = language.code
-                            LanguageManager.setAppLocale(context, language.code)
-                        }
+                        userSelectedCode = language.code
                     }
                 )
             }

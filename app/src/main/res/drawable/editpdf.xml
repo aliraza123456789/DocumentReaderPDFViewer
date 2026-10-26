@@ -4,6 +4,7 @@
     android:height="48dp"
     android:viewportWidth="48"
     android:viewportHeight="48">
+  <!-- Document base with vibrant Indigo / Violet gradient -->
   <path
       android:pathData="M12,4H30L38,12V40a4,4 0,0 1,-4 4H12a4,4 0,0 1,-4 -4V8a4,4 0,0 1,4 -4Z">
     <aapt:attr name="android:fillColor">
@@ -13,21 +14,61 @@
           android:endX="38"
           android:endY="44"
           android:type="linear">
-        <item android:offset="0" android:color="#FFFF6B6B"/>
-        <item android:offset="1" android:color="#FFE03131"/>
+        <item android:offset="0" android:color="#FF6366F1"/>
+        <item android:offset="1" android:color="#FF4338CA"/>
       </gradient>
     </aapt:attr>
   </path>
+  <!-- Fold corner -->
   <path
       android:pathData="M30,4L38,12H30Z"
       android:fillColor="#FFFFFF"
       android:fillAlpha="0.4"/>
+  <!-- Text line 1 -->
   <path
-      android:pathData="M13.5,18L28.5,18A1.5,1.5 0,0 1,30 19.5L30,19.5A1.5,1.5 0,0 1,28.5 21L13.5,21A1.5,1.5 0,0 1,12 19.5L12,19.5A1.5,1.5 0,0 1,13.5 18z"
-      android:fillColor="#FFFFFF"
-      android:fillAlpha="0.92"/>
+      android:pathData="M16,18.5h11"
+      android:strokeWidth="2.5"
+      android:fillColor="#00000000"
+      android:strokeColor="#FFFFFF"
+      android:strokeLineCap="round"/>
+  <!-- Text line 2 -->
   <path
-      android:pathData="M13.5,24L21.66,24A1.5,1.5 0,0 1,23.16 25.5L23.16,25.5A1.5,1.5 0,0 1,21.66 27L13.5,27A1.5,1.5 0,0 1,12 25.5L12,25.5A1.5,1.5 0,0 1,13.5 24z"
-      android:fillColor="#FFFFFF"
-      android:fillAlpha="0.92"/>
+      android:pathData="M16,24h7"
+      android:strokeWidth="2.5"
+      android:fillColor="#00000000"
+      android:strokeColor="#FFFFFF"
+      android:strokeLineCap="round"/>
+  <!-- Text line 3 (fainter / shorter) -->
+  <path
+      android:pathData="M16,29.5h5"
+      android:strokeWidth="2.5"
+      android:fillColor="#00000000"
+      android:strokeColor="#FFFFFF"
+      android:strokeAlpha="0.6"
+      android:strokeLineCap="round"/>
+  <!-- Pencil circular badge backing for punchy contrast -->
+  <path
+      android:pathData="M31.5,29.5m-8.5,0a8.5,8.5 0,1 1,17 0a8.5,8.5 0,1 1,-17 0"
+      android:fillColor="#312E81"/>
+  <!-- Crisp Pencil angled at 45 degrees -->
+  <!-- Pencil shaft (Golden Amber) -->
+  <path
+      android:pathData="M27.5,30.5L34,24L37,27L30.5,33.5Z"
+      android:fillColor="#FBBF24"/>
+  <!-- Pencil eraser cap (Soft Coral/Pink) -->
+  <path
+      android:pathData="M34,24L35.5,22.5A1.4,1.4 0,0 1,37.5 22.5L38.5,23.5A1.4,1.4 0,0 1,38.5 25.5L37,27Z"
+      android:fillColor="#F472B6"/>
+  <!-- Pencil metal ferrule band -->
+  <path
+      android:pathData="M33.2,24.8L34.2,23.8L37.2,26.8L36.2,27.8Z"
+      android:fillColor="#E2E8F0"/>
+  <!-- Pencil wood tip (Warm Cream) -->
+  <path
+      android:pathData="M27.5,30.5L30.5,33.5L25.5,35.5Z"
+      android:fillColor="#FDE68A"/>
+  <!-- Pencil graphite lead point -->
+  <path
+      android:pathData="M26.3,34.2L27,33.5L25.5,35.5Z"
+      android:fillColor="#1E293B"/>
 </vector>

@@ -48,6 +48,7 @@ import com.pdf.alldocument.office.pdfreaderapp.presentation.tools.lock.LockPdfSc
 import com.pdf.alldocument.office.pdfreaderapp.presentation.tools.unlock.UnlockPdfScreen
 import com.pdf.alldocument.office.pdfreaderapp.presentation.tools.split.SplitPdfScreen
 import com.pdf.alldocument.office.pdfreaderapp.presentation.pdftools.tools.CompressScreen
+import com.pdf.alldocument.office.pdfreaderapp.presentation.pdftools.tools.AddTextScreen
 import com.pdf.alldocument.office.pdfreaderapp.presentation.tools.imagetopdf.ImageToPdfScreen
 import com.pdf.alldocument.office.pdfreaderapp.presentation.tools.scantopdf.ScanToPdfScreen
 import com.pdf.alldocument.office.pdfreaderapp.presentation.tools.imagetotext.ImageToTextScreen
@@ -207,7 +208,7 @@ fun AppNavigation(navController: NavHostController) {
                     },
                     onNavigateToOfficeViewer = openOfficeDoc,
                     onNavigateToSearch = { navController.navigate(Screen.GlobalSearch()) },
-                    onNavigateToTools = { navController.navigate(Screen.PdfToolsHome) },
+                    onNavigateToTools = { navController.navigate(Screen.ToolsHome) },
                     onNavigateToPremium = { navController.navigate(Screen.Premium()) },
                     onNavigateToLanguage = { navController.navigate(Screen.LanguageSelection(isFirstLaunch = false)) }
                 )
@@ -249,7 +250,7 @@ fun AppNavigation(navController: NavHostController) {
                 MoreScreen(
                     onNavigateToFileManager = { navController.navigate(Screen.FileManager) },
                     onNavigateToSearch = { navController.navigate(Screen.GlobalSearch()) },
-                    onNavigateToTools = { navController.navigate(Screen.PdfToolsHome) },
+                    onNavigateToTools = { navController.navigate(Screen.ToolsHome) },
                     onNavigateToPremium = { navController.navigate(Screen.Premium()) },
                     onNavigateToLanguage = { navController.navigate(Screen.LanguageSelection(isFirstLaunch = false)) },
                     onNavigateToPrivacyPolicy = { navController.navigate(Screen.PrivacyPolicy(isFirstLaunch = false)) }
@@ -320,7 +321,8 @@ fun AppNavigation(navController: NavHostController) {
                     onNavigateToOfficeToPdf = { navController.navigate(Screen.OfficeToPdf) },
                     onNavigateToWordToPdf = { navController.navigate(Screen.WordToPdf) },
                     onNavigateToPdfToWord = { navController.navigate(Screen.PdfToWord) },
-                    onNavigateToCompress = { navController.navigate(Screen.CompressPdf) }
+                    onNavigateToCompress = { navController.navigate(Screen.CompressPdf) },
+                    onNavigateToEditPdf = { navController.navigate(Screen.EditPdf) }
                 )
             }
 
@@ -422,6 +424,10 @@ fun AppNavigation(navController: NavHostController) {
 
             composable<Screen.CompressPdf> {
                 CompressScreen(onBack = { navController.popBackStack() })
+            }
+
+            composable<Screen.EditPdf> {
+                AddTextScreen(onBack = { navController.popBackStack() })
             }
 
             composable<Screen.MergePdf> {
